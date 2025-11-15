@@ -1,0 +1,53 @@
+/**
+ * {{description}}{{^description}}{{classname}}{{/description}}{{#isDeprecated}}
+ * @deprecated{{/isDeprecated}}
+ */{{#isDeprecated}}
+@Deprecated{{/isDeprecated}}
+{{#swagger1AnnotationLibrary}}
+{{#description}}
+@ApiModel(description = "{{{.}}}")
+{{/description}}
+{{/swagger1AnnotationLibrary}}
+{{#swagger2AnnotationLibrary}}
+{{#description}}
+@Schema(description = "{{{.}}}")
+{{/description}}
+{{/swagger2AnnotationLibrary}}
+{{#jackson}}
+@JsonPropertyOrder({
+{{#vars}}
+  {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
+{{/vars}}
+})
+{{#isClassnameSanitized}}
+{{^hasDiscriminatorWithNonEmptyMapping}}
+@JsonTypeName("{{name}}")
+{{/hasDiscriminatorWithNonEmptyMapping}}
+{{/isClassnameSanitized}}
+{{/jackson}}
+{{>additionalModelTypeAnnotations}}{{>generatedAnnotation}}{{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{>xmlAnnotation}}
+{{#vendorExtensions.x-class-extra-annotation}}
+{{{vendorExtensions.x-class-extra-annotation}}}
+{{/vendorExtensions.x-class-extra-annotation}}
+public record {{classname}}(
+{{#vars}}
+  {{#jackson}}@JsonProperty({{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}){{/jackson}}
+  {{>nullable_var_annotations}}
+  {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}
+  {{#vendorExtensions.x-field-extra-annotation}}{{{vendorExtensions.x-field-extra-annotation}}} {{/vendorExtensions.x-field-extra-annotation}}
+  {{{datatypeWithEnum}}} {{name}}{{^-last}},{{/-last}}
+{{/vars}}
+) {{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {
+
+  // JSON property name constants
+  {{#vars}}
+  {{#jackson}}public static final String JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}";{{/jackson}}
+  {{/vars}}
+
+  // Inner enums (for properties that are enums)
+  {{#vars}}
+  {{#isEnum}}
+{{>modelInnerEnum}}
+  {{/isEnum}}
+  {{/vars}}
+}

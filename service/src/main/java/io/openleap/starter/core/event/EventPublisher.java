@@ -1,0 +1,126 @@
+/*
+ * This file is part of the openleap.io software project.
+ *
+ *  Copyright (C) 2025 Dr.-Ing. Sören Kemmann
+ *
+ * This software is dual-licensed under:
+ *
+ * 1. The European Union Public License v.1.2 (EUPL)
+ *    https://joinup.ec.europa.eu/collection/eupl
+ *
+ *     You may use, modify and redistribute this file under the terms of the EUPL.
+ *
+ *  2. A commercial license available from:
+ *
+ *     B+B Unternehmensberatung GmbH & Co.KG
+ *     Robert-Bunsen-Straße 10
+ *     67098 Bad Dürkheim
+ *     Germany
+ *     Contact: license@bb-online.de
+ *
+ *  You may choose which license to apply.
+ */
+package io.openleap.starter.core.event;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openleap.starter.core.repository.OutboxRepository;
+import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.service.OutboxDispatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.time.Instant;
+import java.util.Map;
+
+/**
+ * Transactional event publisher that writes to the Outbox table.
+ * A separate dispatcher will forward records to RabbitMQ.
+ */
+@Service
+public class EventPublisher {
+
+    private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
+    private final OutboxDispatcher outboxDispatcher;
+
+    // Optional coverage tracker: when enabled, records messages actually enqueued (runtime truth)
+    @Autowired(required = false)
+    private MessageCoverageTracker coverageTracker;
+
+    @Value("${ol.starter.service.messaging.coverage:false}")
+    private boolean coverageEnabled;
+
+    @Value("${ol.starter.service.messaging.outbox.dispatcher.wakeupAfterCommit:true}")
+    private boolean wakeupAfterCommit;
+
+    @Value("${ol.starter.service.messaging.events-exchange:ol.exchange.events}")
+    private String eventsExchange;
+
+    @Autowired
+    public EventPublisher(OutboxRepository outboxRepository, ObjectMapper objectMapper, OutboxDispatcher outboxDispatcher) {
+        this.outboxRepository = outboxRepository;
+        this.objectMapper = objectMapper;
+        this.outboxDispatcher = outboxDispatcher;
+    }
+
+    // Backwards-compatible constructor for tests or contexts that don't need immediate dispatch
+    public EventPublisher(OutboxRepository outboxRepository, ObjectMapper objectMapper) {
+        this(outboxRepository, objectMapper, null);
+    }
+
+    @Transactional
+    public void enqueue(RoutingKey routingKey, Object payload, Map<String, String> headers) {
+        this.enqueue(eventsExchange, routingKey, payload, headers);
+    }
+
+    @Transactional
+    public void enqueue(String exchangeKey, RoutingKey routingKey, Object payload, Map<String, String> headers) {
+        try {
+            // Enrich headers with traceId and eventId if missing
+            Map<String, String> hdrs = headers == null ? new java.util.HashMap<>() : new java.util.HashMap<>(headers);
+            String traceId = org.slf4j.MDC.get("traceId");
+            if (traceId != null && !traceId.isBlank()) {
+                hdrs.putIfAbsent("traceId", traceId);
+            }
+            hdrs.putIfAbsent("eventId", java.util.UUID.randomUUID().toString());
+
+            OutboxEvent e = new OutboxEvent();
+            e.setUuid(java.util.UUID.randomUUID());
+            e.setExchangeKey(exchangeKey);
+            e.setRoutingKey(routingKey.key());
+            e.setOccurredAt(Instant.now());
+            e.setPublished(false);
+            e.setAttempts(0);
+            e.setNextAttemptAt(null);
+            e.setPayloadJson(objectMapper.writeValueAsString(payload));
+            e.setHeadersJson(hdrs.isEmpty() ? null : objectMapper.writeValueAsString(hdrs));
+            outboxRepository.save(e);
+
+            // Record coverage with the actual configured exchange + routing key (if enabled)
+            if (coverageEnabled && coverageTracker != null) {
+                coverageTracker.recordSentMessage(exchangeKey, routingKey.key());
+            }
+
+            // Immediately trigger dispatch after the transaction commits (if enabled and dispatcher available)
+            if (wakeupAfterCommit && outboxDispatcher != null) {
+                if (TransactionSynchronizationManager.isSynchronizationActive()) {
+                    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            outboxDispatcher.wakeup();
+                        }
+                    });
+                } else {
+                    // Fallback: no active transaction (shouldn't happen due to @Transactional)
+                    outboxDispatcher.dispatch();
+                }
+            }
+        } catch (Exception ex) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR, "EVENT_ENQUEUE_FAILED");
+        }
+    }
+}
