@@ -20,12 +20,12 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.messaging.service;
 
+import io.openleap.starter.core.config.OlStarterServiceProperties;
 import io.openleap.starter.core.repository.OutboxRepository;
 import io.openleap.starter.core.repository.entity.OutboxEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -44,16 +44,20 @@ public class MetricsService {
 
     private final OutboxRepository outboxRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final OlStarterServiceProperties config;
 
-    @Value("${ol.starter.service.metrics.queues.main:}")
     private String mainQueueName;
 
-    @Value("${ol.starter.service.metrics.queues.dlq:}")
     private String dlqQueueName;
 
-    public MetricsService(OutboxRepository outboxRepository, RabbitTemplate rabbitTemplate) {
+    public MetricsService(OlStarterServiceProperties config, OutboxRepository outboxRepository, RabbitTemplate rabbitTemplate) {
         this.outboxRepository = outboxRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.config = config;
+        if (config == null) return;
+            this.mainQueueName = config.getMessaging().getMetrics().getQueues().getMain();
+            this.dlqQueueName = config.getMessaging().getMetrics().getQueues().getDlq();
+
     }
 
     public Map<String, Object> snapshot() {

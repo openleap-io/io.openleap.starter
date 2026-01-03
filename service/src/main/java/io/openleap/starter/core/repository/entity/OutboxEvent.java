@@ -32,7 +32,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 /**
- * Transactional outbox record for reliable event publication.
+ * Transactional outbox record for reliable messaging publication.
  * Records are inserted within domain transactions and later dispatched to the broker.
  * Backed by fi_acc.outbox.
  */

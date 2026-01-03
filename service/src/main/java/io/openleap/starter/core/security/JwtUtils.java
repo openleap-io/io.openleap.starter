@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.security;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

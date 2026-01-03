@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.messaging.service;
 
 import io.openleap.starter.core.repository.OutboxRepository;
 import io.openleap.starter.core.repository.entity.OutboxEvent;

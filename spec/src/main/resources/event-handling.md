@@ -9,8 +9,8 @@ This document defines the event-driven messaging model used by services dependin
 
 ## Components provided by `base`
 - Outbound (no change in concept):
-  - `io.openleap.starter.core.event.EventPublisher` — writes outbox records and triggers dispatch after commit.
-  - `io.openleap.starter.core.service.OutboxDispatcher` — scheduled/triggered dispatcher to RabbitMQ with confirms & retries.
+  - `io.openleap.starter.core.messaging.event.EventPublisher` — writes outbox records and triggers dispatch after commit.
+  - `io.openleap.starter.core.messaging.service.OutboxDispatcher` — scheduled/triggered dispatcher to RabbitMQ with confirms & retries.
 - Inbound (new):
   - Rabbit listener infrastructure (container factory and message converters) so services can implement `@RabbitListener` methods for their commands/events.
 - Serialization:

@@ -20,8 +20,11 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.messaging.config;
 
+import io.openleap.starter.core.config.IdentityHolder;
+import io.openleap.starter.core.config.OlStarterServiceProperties;
+import io.openleap.starter.core.security.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
@@ -57,7 +60,7 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
     public Message postProcessMessage(Message message) throws AmqpRejectAndDontRequeueException {
         OlStarterServiceProperties.Security.Mode mode = resolveMode();
         try {
-            if (mode == OlStarterServiceProperties.Security.Mode.simplesec) {
+            if (mode == OlStarterServiceProperties.Security.Mode.iamsec) {
                 applyFromJwt(message.getMessageProperties());
             } else {
                 applyFromHeaders(message.getMessageProperties());

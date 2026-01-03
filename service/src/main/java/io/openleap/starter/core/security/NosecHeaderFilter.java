@@ -20,8 +20,9 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.security;
 
+import io.openleap.starter.core.config.IdentityHolder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

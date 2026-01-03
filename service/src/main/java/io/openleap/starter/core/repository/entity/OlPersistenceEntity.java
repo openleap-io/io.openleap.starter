@@ -23,11 +23,8 @@
 
 package io.openleap.starter.core.repository.entity;
 
+import io.openleap.starter.core.util.OlUuid;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -36,13 +33,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@SuperBuilder
-@NoArgsConstructor
-@Getter
-@Setter
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
 /**
@@ -61,7 +53,7 @@ public abstract class OlPersistenceEntity implements Serializable {
     private Long pKey;
 
     @Column(name = "uuid")
-    private UUID uuid;
+    private UUID id;
 
 
     @Version
@@ -80,7 +72,7 @@ public abstract class OlPersistenceEntity implements Serializable {
             name = "created_by"
     )
     @CreatedBy
-    private String createdBy;
+    private UUID createdBy;
 
     @Column(
             name = "updated_at"
@@ -92,6 +84,140 @@ public abstract class OlPersistenceEntity implements Serializable {
             name = "updated_by"
     )
     @LastModifiedBy
-    private String updatedBy;
+    private UUID updatedBy;
 
+    public OlPersistenceEntity() {
+    }
+
+    protected OlPersistenceEntity(OlPersistenceEntityBuilder<?, ?> b) {
+        this.pKey = b.pKey;
+        this.id = b.id;
+        this.version = b.version;
+        this.createdAt = b.createdAt;
+        this.createdBy = b.createdBy;
+        this.updatedAt = b.updatedAt;
+        this.updatedBy = b.updatedBy;
+    }
+
+    @PrePersist
+    protected void ensureUuid() {
+        if (this.id == null) {
+            this.id = OlUuid.create();
+        }
+    }
+
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Long getpKey() {
+        return pKey;
+    }
+
+    public void setpKey(Long pKey) {
+        this.pKey = pKey;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(UUID updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
+    public String getShortId() {
+        if (this.id == null) return null;
+        return OlUuid.toShortBase64(this.id);
+    }
+
+    public static abstract class OlPersistenceEntityBuilder<C extends OlPersistenceEntity, B extends OlPersistenceEntityBuilder<C, B>> {
+        private Long pKey;
+        private UUID id;
+        private long version;
+        private Instant createdAt;
+        private UUID createdBy;
+        private Instant updatedAt;
+        private UUID updatedBy;
+
+        public B pKey(Long pKey) {
+            this.pKey = pKey;
+            return self();
+        }
+
+        public B id(UUID id) {
+            this.id = id;
+            return self();
+        }
+
+        public B version(long version) {
+            this.version = version;
+            return self();
+        }
+
+        public B createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return self();
+        }
+
+        public B createdBy(UUID createdBy) {
+            this.createdBy = createdBy;
+            return self();
+        }
+
+        public B updatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return self();
+        }
+
+        public B updatedBy(UUID updatedBy) {
+            this.updatedBy = updatedBy;
+            return self();
+        }
+
+        protected abstract B self();
+
+        public abstract C build();
+
+        public String toString() {
+            return "OlPersistenceEntity.OlPersistenceEntityBuilder(pKey=" + this.pKey + ", id=" + this.id + ", version=" + this.version + ", createdAt=" + this.createdAt + ", createdBy=" + this.createdBy + ", lastModifiedAt=" + this.updatedAt + ", lastModifiedBy=" + this.updatedBy + ")";
+        }
+    }
 }

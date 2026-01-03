@@ -20,8 +20,9 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.repository.config;
 
+import io.openleap.starter.core.config.IdentityHolder;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

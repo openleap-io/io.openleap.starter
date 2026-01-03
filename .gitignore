@@ -23,6 +23,11 @@
 hs_err_pid*
 replay_pid*
 /target/**
+/api/target/**
+/client/target/**
+/service/target/**
+/spec/target/**
+/testkit/target/**
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/usage.statistics.xml
@@ -30,4 +35,5 @@ replay_pid*
 .idea/caches/
 .idea/contentModel.xml
 .idea/aws.xml
+.junie-plan
 

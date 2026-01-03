@@ -20,10 +20,8 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.event;
+package io.openleap.starter.core.messaging;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;

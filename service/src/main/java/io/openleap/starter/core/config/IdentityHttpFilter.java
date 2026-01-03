@@ -22,6 +22,7 @@
  */
 package io.openleap.starter.core.config;
 
+import io.openleap.starter.core.security.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         OlStarterServiceProperties.Security.Mode mode = resolveMode();
         try {
-            if (mode == OlStarterServiceProperties.Security.Mode.simplesec) {
+            if (mode == OlStarterServiceProperties.Security.Mode.iamsec) {
                 applyFromJwt(request);
             } else {
                 applyFromHeaders(request);

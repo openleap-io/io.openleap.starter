@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.messaging.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.starter.core.repository.OutboxRepository;
@@ -91,7 +91,7 @@ public class OutboxDispatcher {
      * Backup scheduled tick: if fixedDelay is set to 0, the scheduled wakeup is effectively disabled.
      * Otherwise, it only signals the worker to perform a dispatch pass.
      */
-    @Scheduled(fixedDelayString = "${ol.starter.service.messaging.outbox.dispatcher.fixedDelay:1000}")
+    @Scheduled(fixedDelayString = "${ol.service.messaging.outbox.dispatcher.fixedDelay:1000}")
     public void scheduledTick() {
         if (!enabled) return;
         if (fixedDelayMs == 0) {
@@ -175,7 +175,7 @@ public class OutboxDispatcher {
 
                     String payload = ob.getPayloadJson();
                     Map<String, Object> headers = parseHeaders(ob.getHeadersJson());
-                    CorrelationData cd = new CorrelationData(ob.getUuid() != null ? ob.getUuid().toString() : null);
+                    CorrelationData cd = new CorrelationData(ob.getId() != null ? ob.getId().toString() : null);
                     rabbitTemplate.convertAndSend(ob.getExchangeKey(), ob.getRoutingKey(), payload, message -> {
                         if (headers != null) {
                             for (Map.Entry<String, Object> e : headers.entrySet()) {
@@ -190,13 +190,13 @@ public class OutboxDispatcher {
                     if (confirm != null && confirm.isAck()) {
                         if (deleteOnAck) {
                             outboxRepository.delete(ob);
-                            log.info("[Outbox] Published and deleted (ack) routingKey={} id={}", rk, ob.getUuid());
+                            log.info("[Outbox] Published and deleted (ack) routingKey={} id={}", rk, ob.getId());
                         } else {
                             ob.setPublished(true);
                             ob.setNextAttemptAt(null);
                             ob.setLastError(null);
                             outboxRepository.save(ob);
-                            log.info("[Outbox] Published (ack) routingKey={} id={}", rk, ob.getUuid());
+                            log.info("[Outbox] Published (ack) routingKey={} id={}", rk, ob.getId());
                         }
                     } else {
                         String cause = confirm != null ? confirm.getReason() : "No confirm (timeout)";
@@ -221,7 +221,7 @@ public class OutboxDispatcher {
         ob.setLastError(safeError);
         if (attempts >= maxAttempts) {
             ob.setNextAttemptAt(null); // park (DLQ)
-            log.error("[Outbox] Parking record after maxAttempts={} id={} error={}", maxAttempts, ob.getUuid(), safeError);
+            log.error("[Outbox] Parking record after maxAttempts={} id={} error={}", maxAttempts, ob.getId(), safeError);
         } else {
             Duration backoff = Duration.ofSeconds(Math.min(60, (long) Math.pow(2, Math.min(6, attempts))));
             ob.setNextAttemptAt(Instant.now().plus(backoff));

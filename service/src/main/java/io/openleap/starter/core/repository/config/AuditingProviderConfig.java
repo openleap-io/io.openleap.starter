@@ -20,8 +20,9 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.repository.config;
 
+import io.openleap.starter.core.config.IdentityHolder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

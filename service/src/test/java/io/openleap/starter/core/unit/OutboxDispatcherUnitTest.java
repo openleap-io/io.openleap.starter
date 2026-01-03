@@ -25,7 +25,7 @@ package io.openleap.starter.core.unit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.starter.core.repository.OutboxRepository;
 import io.openleap.starter.core.repository.entity.OutboxEvent;
-import io.openleap.starter.core.service.OutboxDispatcher;
+import io.openleap.starter.core.messaging.service.OutboxDispatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -66,7 +66,7 @@ class OutboxDispatcherUnitTest {
     void dispatch_onPublishFailure_incrementsAttempts_andParksAtMax() throws Exception {
         // Prepare one pending outbox record
         OutboxEvent ob = new OutboxEvent();
-        ob.setUuid(UUID.randomUUID());
+        ob.setId(UUID.randomUUID());
         ob.setRoutingKey("fi.acc.test");
         ob.setPayloadJson("{\"x\":1}");
         ob.setHeadersJson("{\"h\":\"v\"}");

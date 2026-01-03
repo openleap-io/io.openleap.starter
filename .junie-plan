@@ -1,0 +1,27 @@
+Plan to resolve Flyway executing PostgreSQL-only migration on H2 (Option B)
+
+1) Verify current state
+   - Confirm which migration files are packaged in pur.sup/target/classes/db/migration/**
+   - Confirm presence of db/migration/postgresql/V3__price_window_exclusion.sql and removal of any root-level V3 PG scripts
+
+2) Configure Flyway locations per profile
+   - Default profile (H2/dev/test): set spring.flyway.locations=classpath:db/migration
+   - Add a dedicated postgres profile: set spring.flyway.locations=classpath:db/migration,classpath:db/migration/postgresql
+
+3) Align resource packaging
+   - Ensure Maven resources DO include db/migration/postgresql/** (remove exclusions that hide it)
+   - Remove any root-level vendor-suffixed PG scripts to avoid duplication
+
+4) Cleanup conflicting changes
+   - Revert prior POM exclusions that block packaging of PG subfolder
+   - Delete root file V3__price_window_exclusion__postgresql.sql (if still present)
+
+5) Validate on H2
+   - Clean schema and run application; expect only V1 and V2 to apply
+
+6) Validate on PostgreSQL
+   - Run with spring.profiles.active=postgres; expect V1, V2, and V3(PostgreSQL) apply successfully
+
+7) Documentation
+   - Add header comments to V3 Postgres migration noting it is activated via postgres profile locations
+   - Update README with run instructions for Postgres profile

@@ -20,22 +20,18 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.messaging;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-/**
- * Ensures IdentityHolder is cleared after listener method execution to avoid leaking identity
- * across messages in the same listener thread.
- */
-public class MessagingIdentityClearingAdvice implements MethodInterceptor {
-    @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        try {
-            return invocation.proceed();
-        } finally {
-            IdentityHolder.clear();
-        }
-    }
+import java.util.Set;
+
+@Data
+@AllArgsConstructor
+public class MessageCoverageReport {
+    private int totalMessages;
+    private int coveredMessages;
+    private Set<String> uncoveredMessages;
+    private double coveragePercentage;
 }

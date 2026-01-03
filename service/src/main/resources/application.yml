@@ -1,7 +1,8 @@
 ol:
   service:
     messaging:
-      events-exchange: ${OL_EVENTS_EXCHANGE:fi.acc.events}
+      events-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.events}
+      commands-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.commands}
       coverage: ${OL_MESSAGE_COVERAGE:false}
       registry:
         enabled: ${OL_SCHEMA_REGISTRY_ENABLED:false}

@@ -20,10 +20,24 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.event;
+package io.openleap.starter.core.messaging.config;
 
-public record RoutingKey(
-        String key,
-        String description
-) {
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
+
+import java.lang.annotation.*;
+
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface MessageTopologyConfiguration  {
+    @AliasFor(
+            annotation = Component.class
+    )
+    String value() default "";
+
+    boolean proxyBeanMethods() default true;
+
+    boolean enforceUniqueMethods() default true;
 }

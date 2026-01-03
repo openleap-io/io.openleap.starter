@@ -81,6 +81,8 @@ mvn test
 - Service developer guideline: `spec/microservice-developer-guideline.md`
 - Spec TODOs and backlog: `spec/microservice-todo.md`
 - Testkit usage: `testkit/README.md`
+- Core-Service Starter Doku: `docs/core-service-starter.md`
+ - Core-Service Starter docs (EN): `docs/core-service-starter.en.md`
 
 ## Versioning
 

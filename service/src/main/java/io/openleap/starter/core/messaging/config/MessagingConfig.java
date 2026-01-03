@@ -20,17 +20,18 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.config;
+package io.openleap.starter.core.messaging.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openleap.starter.core.event.MessageCoverageTracker;
+import io.openleap.starter.core.config.OlStarterServiceProperties;
+import io.openleap.starter.core.messaging.MessageCoverageTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -47,8 +48,11 @@ public class MessagingConfig {
 
     private static final Logger log = LoggerFactory.getLogger(MessagingConfig.class);
 
-    @Value("${ol.starter.service.messaging.events-exchange:openleap-events}")
+    @Value("${ol.service.messaging.events-exchange:ol.exchange.events}")
     public String EVENTS_EXCHANGE;
+
+    @Value("${ol.service.messaging.commands-exchange:ol.exchange.commands}")
+    public String COMMANDS_EXCHANGE;
 
     @Autowired
     private MessageCoverageTracker coverageTracker;
@@ -57,8 +61,17 @@ public class MessagingConfig {
     private OlStarterServiceProperties olStarterServiceProperties;
 
     @Bean
-    public TopicExchange accEventsExchange() {
+    public TopicExchange eventsExchange() {
+        if (olStarterServiceProperties != null)
+            return new TopicExchange(olStarterServiceProperties.getMessaging().getEventsExchange(), true, false);
         return new TopicExchange(EVENTS_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public TopicExchange commandsExchange() {
+        if (olStarterServiceProperties != null)
+            return new TopicExchange(olStarterServiceProperties.getMessaging().getCommandsExchange(), true, false);
+        return new TopicExchange(COMMANDS_EXCHANGE, true, false);
     }
 
     @Bean

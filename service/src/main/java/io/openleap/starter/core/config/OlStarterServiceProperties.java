@@ -24,7 +24,7 @@ package io.openleap.starter.core.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "ol.starter.service")
+@ConfigurationProperties(prefix = "ol.service")
 public class OlStarterServiceProperties {
 
     private Messaging messaging = new Messaging();
@@ -47,11 +47,12 @@ public class OlStarterServiceProperties {
         public Mode getMode() { return mode; }
         public void setMode(Mode mode) { this.mode = mode; }
 
-        public enum Mode { nosec, simplesec }
+        public enum Mode { nosec, iamsec}
     }
 
     public static class Messaging {
-        private String eventsExchange = "fi.acc.events";
+        private String eventsExchange = "ol.exchange.events";
+        private String commandsExchange = "ol.exchange.commands";
         private boolean coverage = false;
         private Registry registry = new Registry();
         private Outbox outbox = new Outbox();
@@ -59,6 +60,8 @@ public class OlStarterServiceProperties {
 
         public String getEventsExchange() { return eventsExchange; }
         public void setEventsExchange(String eventsExchange) { this.eventsExchange = eventsExchange; }
+        public String getCommandsExchange() { return commandsExchange; }
+        public void setCommandsExchange(String commandsExchange) { this.commandsExchange = commandsExchange; }
         public boolean isCoverage() { return coverage; }
         public void setCoverage(boolean coverage) { this.coverage = coverage; }
         public Registry getRegistry() { return registry; }

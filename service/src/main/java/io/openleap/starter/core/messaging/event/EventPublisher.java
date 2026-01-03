@@ -20,14 +20,17 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.event;
+package io.openleap.starter.core.messaging.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openleap.starter.core.config.OlStarterServiceProperties;
+import io.openleap.starter.core.messaging.MessageCoverageTracker;
+import io.openleap.starter.core.messaging.RoutingKey;
 import io.openleap.starter.core.repository.OutboxRepository;
 import io.openleap.starter.core.repository.entity.OutboxEvent;
-import io.openleap.starter.core.service.OutboxDispatcher;
+import io.openleap.starter.core.messaging.service.OutboxDispatcher;
+import io.openleap.starter.core.util.OlUuid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -37,7 +40,7 @@ import java.time.Instant;
 import java.util.Map;
 
 /**
- * Transactional event publisher that writes to the Outbox table.
+ * Transactional messaging publisher that writes to the Outbox table.
  * A separate dispatcher will forward records to RabbitMQ.
  */
 @Service
@@ -46,39 +49,43 @@ public class EventPublisher {
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
     private final OutboxDispatcher outboxDispatcher;
+    private final OlStarterServiceProperties config;
 
     // Optional coverage tracker: when enabled, records messages actually enqueued (runtime truth)
     @Autowired(required = false)
     private MessageCoverageTracker coverageTracker;
 
-    @Value("${ol.starter.service.messaging.coverage:false}")
     private boolean coverageEnabled;
 
-    @Value("${ol.starter.service.messaging.outbox.dispatcher.wakeupAfterCommit:true}")
     private boolean wakeupAfterCommit;
 
-    @Value("${ol.starter.service.messaging.events-exchange:ol.exchange.events}")
     private String eventsExchange;
 
     @Autowired
-    public EventPublisher(OutboxRepository outboxRepository, ObjectMapper objectMapper, OutboxDispatcher outboxDispatcher) {
+    public EventPublisher(OlStarterServiceProperties config, OutboxRepository outboxRepository, ObjectMapper objectMapper, OutboxDispatcher outboxDispatcher) {
+        this.config = config;
         this.outboxRepository = outboxRepository;
         this.objectMapper = objectMapper;
         this.outboxDispatcher = outboxDispatcher;
+        if (config != null && config.getMessaging() != null && config.getMessaging().getOutbox() != null) {
+            this.coverageEnabled = config.getMessaging().isCoverage();
+            this.wakeupAfterCommit = config.getMessaging().getOutbox().getDispatcher().isWakeupAfterCommit();
+            this.eventsExchange = config.getMessaging().getEventsExchange();
+        }
     }
 
     // Backwards-compatible constructor for tests or contexts that don't need immediate dispatch
-    public EventPublisher(OutboxRepository outboxRepository, ObjectMapper objectMapper) {
-        this(outboxRepository, objectMapper, null);
+    public EventPublisher(OlStarterServiceProperties config, OutboxRepository outboxRepository, ObjectMapper objectMapper) {
+        this(config, outboxRepository, objectMapper, null);
     }
 
     @Transactional
-    public void enqueue(RoutingKey routingKey, Object payload, Map<String, String> headers) {
+    public void enqueue(RoutingKey routingKey, EventPayload payload, Map<String, String> headers) {
         this.enqueue(eventsExchange, routingKey, payload, headers);
     }
 
     @Transactional
-    public void enqueue(String exchangeKey, RoutingKey routingKey, Object payload, Map<String, String> headers) {
+    public void enqueue(String exchangeKey, RoutingKey routingKey, EventPayload payload, Map<String, String> headers) {
         try {
             // Enrich headers with traceId and eventId if missing
             Map<String, String> hdrs = headers == null ? new java.util.HashMap<>() : new java.util.HashMap<>(headers);
@@ -86,10 +93,10 @@ public class EventPublisher {
             if (traceId != null && !traceId.isBlank()) {
                 hdrs.putIfAbsent("traceId", traceId);
             }
-            hdrs.putIfAbsent("eventId", java.util.UUID.randomUUID().toString());
+            hdrs.putIfAbsent("eventId", OlUuid.create().toString());
 
             OutboxEvent e = new OutboxEvent();
-            e.setUuid(java.util.UUID.randomUUID());
+            e.setId(OlUuid.create());
             e.setExchangeKey(exchangeKey);
             e.setRoutingKey(routingKey.key());
             e.setOccurredAt(Instant.now());

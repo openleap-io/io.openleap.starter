@@ -1,2 +1,2 @@
-io\openleap\base\core\unit\OutboxDispatcherUnitTest.class
-io\openleap\base\core\unit\EventPublisherUnitTest.class
+io\openleap\starter\core\unit\OutboxDispatcherUnitTest.class
+io\openleap\starter\core\unit\EventPublisherUnitTest.class

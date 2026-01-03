@@ -31,8 +31,8 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import io.openleap.starter.core.event.MessageTopologyConfiguration;
-import io.openleap.starter.core.event.RoutingKey;
+import io.openleap.starter.core.messaging.RoutingKey;
+import io.openleap.starter.core.messaging.config.MessageTopologyConfiguration;
 import io.openleap.starter.core.repository.entity.OlPersistenceEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,7 +52,7 @@ public final class ArchitectureRules {
 
     /** Routing key regex: <suite>.<domain>.<aggregate>.<kind>.<action>.v<major> */
     public static final String ROUTING_KEY_REGEX =
-            "^(?<suite>[a-z0-9]+)\\.(?<domain>[a-z0-9]+)\\.(?<aggregate>[a-z0-9]+)\\.(?<kind>command|event)\\.(?<action>[a-z0-9_]+)\\.v(?<major>\\d+)$";
+            "^(?<suite>[a-z0-9]+)\\.(?<domain>[a-z0-9]+)\\.(?<aggregate>[a-z0-9]+)\\.(?<kind>command|messaging)\\.(?<action>[a-z0-9_]+)\\.v(?<major>\\d+)$";
 
     /** Load classes from the given base package for ad-hoc checks. */
     public static JavaClasses load(String basePackage) {

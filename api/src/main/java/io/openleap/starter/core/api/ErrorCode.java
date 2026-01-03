@@ -52,7 +52,7 @@ public enum ErrorCode {
     BASE_CURRENCY_REQUIRED(HttpStatus.BAD_REQUEST, "Base currency required"),
 
     // Events/Outbox
-    EVENT_ENQUEUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to enqueue event");
+    EVENT_ENQUEUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to enqueue messaging");
 
     private final HttpStatus defaultStatus;
     private final String defaultMessage;
