@@ -27,8 +27,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: GITHUB_TOKEN
+          server-username: GH_PACKAGES_USER
+          server-password: GH_PACKAGES_TOKEN
 
       - name: Build project
         run: mvn clean install -DskipTests
@@ -39,5 +39,6 @@ jobs:
       - name: Deploy to GitHub Packages
         run: mvn -B -DskipTests deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_USER: ${{ secrets.GH_PACKAGES_USER }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 

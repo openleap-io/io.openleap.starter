@@ -50,23 +50,12 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/openleap-io/io.openleap.starter</url>
+            <url>https://maven.pkg.github.com/openleap-io/io.openleap.registry</url>
         </repository>
         <snapshotRepository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/openleap-io/io.openleap.starter</url>
+            <url>https://maven.pkg.github.com/openleap-io/io.openleap.registry</url>
         </snapshotRepository>
-        <site>
-            <id>site</id>
-            <url>scm:git:git@github.com:openleap-io/io.openleap.starter.git</url>
-        </site>
     </distributionManagement>
-
-    <scm>
-        <url>https://github.com/openleap-io/io.openleap.starter</url>
-        <connection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</connection>
-        <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
 </project>
