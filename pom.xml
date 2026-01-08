@@ -31,7 +31,7 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <flyway.version>11.1.0</flyway.version>
         <opentelemetry.version>1.41.0</opentelemetry.version>
-
+        <scmuser></scmuser>
     </properties>
 
     <dependencyManagement>
@@ -45,4 +45,28 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/openleap-io/${project.artifactId}</url>
+        </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/openleap-io/${project.artifactId}</url>
+        </snapshotRepository>
+        <site>
+            <id>site</id>
+            <url>scm:git:git@github.com:openleap-io/${project.artifactId}.git</url>
+        </site>
+    </distributionManagement>
+
+    <scm>
+        <url>https://github.com/openleap-io/${project.artifactId}</url>
+        <connection>scm:git:https://${scmuser}github.com/openleap-io/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/${project.artifactId}.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 </project>
