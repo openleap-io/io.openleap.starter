@@ -50,23 +50,23 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/openleap-io/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/openleap-io/io.openleap.starter</url>
         </repository>
         <snapshotRepository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/openleap-io/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/openleap-io/io.openleap.starter</url>
         </snapshotRepository>
         <site>
             <id>site</id>
-            <url>scm:git:git@github.com:openleap-io/${project.artifactId}.git</url>
+            <url>scm:git:git@github.com:openleap-io/io.openleap.starter.git</url>
         </site>
     </distributionManagement>
 
     <scm>
-        <url>https://github.com/openleap-io/${project.artifactId}</url>
-        <connection>scm:git:https://${scmuser}github.com/openleap-io/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/openleap-io/io.openleap.starter</url>
+        <connection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</connection>
+        <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 </project>
