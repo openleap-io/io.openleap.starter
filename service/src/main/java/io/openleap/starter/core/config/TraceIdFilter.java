@@ -38,7 +38,7 @@ import java.util.UUID;
 /**
  * Simple HTTP filter that ensures each request has a traceId in the logging MDC
  * and that the same value is propagated back via response header X-Trace-Id.
- *
+ * <p>
  * Incoming preference order:
  * - X-Trace-Id header (if present and non-blank)
  * - traceId header (fallback)
@@ -56,7 +56,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String incoming = header(request, TRACE_ID_HEADER);
         if (incoming == null || incoming.isBlank()) {
-            incoming = header(request, "traceId");
+            incoming = header(request, TRACE_ID_MDC_KEY);
         }
         String traceId = (incoming == null || incoming.isBlank()) ? UUID.randomUUID().toString() : incoming.trim();
         MDC.put(TRACE_ID_MDC_KEY, traceId);
@@ -73,5 +73,5 @@ public class TraceIdFilter extends OncePerRequestFilter {
     private static String header(HttpServletRequest req, String name) {
         String v = req.getHeader(name);
         return v != null ? v.trim() : null;
-        }
+    }
 }
