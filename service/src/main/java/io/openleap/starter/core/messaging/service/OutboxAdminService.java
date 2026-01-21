@@ -55,23 +55,23 @@ public class OutboxAdminService {
                 .filter(o -> o.getAttempts() >= maxAttempts && o.getNextAttemptAt() == null)
                 .sorted(Comparator.comparing(OutboxEvent::getCreatedAt))
                 .limit(limit > 0 ? limit : Long.MAX_VALUE)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
     public int replayFailed(int limit) {
-        int[] count = {0};
+        int count = 0;
         List<OutboxEvent> all = outboxRepository.findByPublishedFalse();
         for (OutboxEvent o : all) {
             if (o.getAttempts() >= maxAttempts && o.getNextAttemptAt() == null) {
-                if (limit > 0 && count[0] >= limit) break;
+                if (limit > 0 && count >= limit) break;
                 // Reset attempts and schedule immediate retry
                 o.setAttempts(0);
                 o.setNextAttemptAt(Instant.now());
                 o.setLastError(null);
-                count[0]++;
+                count++;
             }
         }
-        return count[0];
+        return count;
     }
 }

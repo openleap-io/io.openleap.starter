@@ -22,8 +22,9 @@
  */
 package io.openleap.starter.core.config;
 
-import io.openleap.starter.core.api.ErrorCode;
-import io.openleap.starter.core.api.ErrorResponse;
+import io.openleap.starter.core.api.error.ErrorCode;
+import io.openleap.starter.core.api.error.ErrorResponse;
+import io.openleap.starter.core.api.error.OlErrorCode;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -40,27 +41,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+// TODO (itaseski): Consider moving to API package
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String TRACE_ID = "traceId";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         log.warn("Validation failed: {} error(s)", ex.getBindingResult().getErrorCount());
         List<Map<String, String>> violations = ex.getBindingResult().getFieldErrors().stream()
                 .map(this::toError)
-                .collect(Collectors.toList());
+                .toList();
         ErrorResponse body = new ErrorResponse(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ErrorCode.VALIDATION_ERROR.message(),
                 violations,
-                MDC.get("traceId")
+                MDC.get(TRACE_ID)
         );
         return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.VALIDATION_ERROR.status());
     }
@@ -71,13 +74,13 @@ public class GlobalExceptionHandler {
         List<Map<String, String>> violations = ex.getConstraintViolations().stream()
                 .map(v -> Map.of(
                         "field", v.getPropertyPath().toString(),
-                        "message", v.getMessage()
-                )).collect(Collectors.toList());
+                        "message", v.getMessage()))
+                .toList();
         ErrorResponse body = new ErrorResponse(
                 ErrorCode.VALIDATION_ERROR.name(),
                 ErrorCode.VALIDATION_ERROR.message(),
                 violations,
-                MDC.get("traceId")
+                MDC.get(TRACE_ID)
         );
         return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.VALIDATION_ERROR.status());
     }
@@ -90,7 +93,7 @@ public class GlobalExceptionHandler {
                 ErrorCode.BAD_REQUEST.name(),
                 ErrorCode.BAD_REQUEST.message(),
                 ex.getMessage(),
-                MDC.get("traceId")
+                MDC.get(TRACE_ID)
         );
         return new ResponseEntity<>(body, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
@@ -111,7 +114,8 @@ public class GlobalExceptionHandler {
             codeStr = reason.substring(0, idx).trim();
             details = reason.substring(idx + 1).trim();
         }
-        ErrorCode code = ErrorCode.from(codeStr);
+
+        ErrorCode code = OlErrorCode.from(ErrorCode.class, codeStr);
         HttpStatusCode statusCode = ex.getStatusCode();
         String message;
         if (code != null) {
@@ -126,9 +130,45 @@ public class GlobalExceptionHandler {
                 code != null ? code.name() : (statusCode.is4xxClientError() ? ErrorCode.BAD_REQUEST.name() : ErrorCode.INTERNAL_ERROR.name()),
                 message != null ? message : (statusCode.is4xxClientError() ? ErrorCode.BAD_REQUEST.message() : ErrorCode.INTERNAL_ERROR.message()),
                 details,
-                MDC.get("traceId")
+                MDC.get(TRACE_ID)
         );
         return new ResponseEntity<>(body, new HttpHeaders(), statusCode);
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
+        log.error("IO error encountered: {}", ex.getMessage(), ex);
+        ErrorResponse body = new ErrorResponse(
+                ErrorCode.INTERNAL_ERROR.name(),
+                ErrorCode.INTERNAL_ERROR.message(),
+                ex.getMessage(),
+                MDC.get(TRACE_ID)
+        );
+        return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.INTERNAL_ERROR.status());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException ex) {
+        log.error("Illegal state encountered: {}", ex.getMessage(), ex);
+        ErrorResponse body = new ErrorResponse(
+                ErrorCode.INTERNAL_ERROR.name(),
+                ErrorCode.INTERNAL_ERROR.message(),
+                ex.getMessage(),
+                MDC.get(TRACE_ID)
+        );
+        return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.INTERNAL_ERROR.status());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        // log event
+        ErrorResponse body = new ErrorResponse(
+                ErrorCode.BAD_REQUEST.name(),
+                ErrorCode.BAD_REQUEST.message(),
+                ex.getMessage(),
+                MDC.get(TRACE_ID)
+        );
+        return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.BAD_REQUEST.status());
     }
 
     @ExceptionHandler(Exception.class)
@@ -138,7 +178,7 @@ public class GlobalExceptionHandler {
                 ErrorCode.INTERNAL_ERROR.name(),
                 ErrorCode.INTERNAL_ERROR.message(),
                 ex.getMessage(),
-                MDC.get("traceId")
+                MDC.get(TRACE_ID)
         );
         return new ResponseEntity<>(body, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
