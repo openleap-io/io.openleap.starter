@@ -38,3 +38,13 @@ replay_pid*
 .idea/$PROJECT_FILE$
 .junie-plan
 
+Ignore Maven build output
+**/target/
+
+# Ignore Gradle build output
+**/build/
+
+# Ignore IntelliJ project files
+.idea/
+*.iml
+
