@@ -12,19 +12,22 @@ import java.util.Objects;
 
 public class SqlTestSupport {
 
+    private static final String TRUNCATE_TABLE_SQL = "TRUNCATE TABLE %s RESTART IDENTITY CASCADE";
+    private static final String COUNT_ROWS_SQL = "SELECT COUNT(*) FROM %s";
+
     private SqlTestSupport() {
 
     }
 
     public static void truncateTables(Environment environment, String... tableNames) throws SQLException {
         String[] truncateQueries = Arrays.stream(tableNames)
-                .map(table -> "TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE")
+                .map(table -> String.format(TRUNCATE_TABLE_SQL, table))
                 .toArray(String[]::new);
         executeSqls(environment, truncateQueries);
     }
 
     public static long countRows(Environment environment, String tableName) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM " + tableName;
+        String sql = String.format(COUNT_ROWS_SQL, tableName);
         try (Connection conn = getConnection(environment);
              Statement stmt = conn.createStatement();
              var rs = stmt.executeQuery(sql)

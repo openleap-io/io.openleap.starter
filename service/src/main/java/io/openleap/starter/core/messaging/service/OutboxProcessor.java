@@ -34,6 +34,8 @@ public class OutboxProcessor {
 
     @Transactional
     public void processOutbox() {
+        // TODO (itaseski): Explore using a thread pool to process messages in parallel,
+        // with a limit, and leverage FOR UPDATE SKIP LOCKED to ensure transactional uniqueness.
         List<OutboxEvent> pending = outboxRepository.findPending();
         log.debug("[Outbox] Found pending size={}", pending.size());
         for (OutboxEvent ob : pending) {
@@ -45,6 +47,7 @@ public class OutboxProcessor {
             try {
                 String rk = ob.getRoutingKey();
 
+                // TODO (itaseski): Consider batching for better performance
                 DispatchResult result = outboxDispatcher.dispatch(ob);
 
                 if (result.success()) {
