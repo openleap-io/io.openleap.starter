@@ -35,5 +35,7 @@ public interface OutboxRepository extends JpaRepository<OutboxEvent, Long> {
     @Query("select o from OutboxEvent o where o.published = false and (o.nextAttemptAt is null or o.nextAttemptAt <= CURRENT_TIMESTAMP) order by o.createdAt asc")
     List<OutboxEvent> findPending();
 
+    // TODO (itaseski): Some methods do additional stream processing on the result.
+    //  Consider adding dedicated queries.
     List<OutboxEvent> findByPublishedFalse();
 }

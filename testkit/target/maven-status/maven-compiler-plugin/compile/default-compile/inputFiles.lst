@@ -1,6 +1,10 @@
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\ArchitectureRules.java
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\identity\IdentityTestExtension.java
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\identity\WithTenant.java
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\messaging\RabbitTestSupport.java
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\schema\SchemaChecks.java
-C:\Users\SKemm\projects\base\testkit\src\main\java\io\openleap\starter\testkit\web\WebMvcCompliance.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/ArchitectureRules.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/config/SpringConfigurationProperties.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/identity/IdentityTestExtension.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/identity/WithTenant.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/io/IOTestSupport.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/messaging/RabbitTestSupport.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/schema/SchemaChecks.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/sql/SqlTestSupport.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/web/WebMvcCompliance.java
+/Users/ivicataseski/openleap/io.openleap.starter/testkit/src/main/java/io/openleap/starter/testkit/wiremock/WireMockTestSupport.java

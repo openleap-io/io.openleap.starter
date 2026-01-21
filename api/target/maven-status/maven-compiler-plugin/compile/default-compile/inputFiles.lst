@@ -1,2 +1,4 @@
-C:\Users\SKemm\projects\base\api\src\main\java\io\openleap\starter\core\api\ErrorCode.java
-C:\Users\SKemm\projects\base\api\src\main\java\io\openleap\starter\core\api\ErrorResponse.java
+/Users/ivicataseski/openleap/io.openleap.starter/api/src/main/java/io/openleap/starter/core/api/dto/OlPageableResponseDto.java
+/Users/ivicataseski/openleap/io.openleap.starter/api/src/main/java/io/openleap/starter/core/api/error/ErrorCode.java
+/Users/ivicataseski/openleap/io.openleap.starter/api/src/main/java/io/openleap/starter/core/api/error/ErrorResponse.java
+/Users/ivicataseski/openleap/io.openleap.starter/api/src/main/java/io/openleap/starter/core/api/error/OlErrorCode.java

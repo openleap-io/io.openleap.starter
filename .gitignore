@@ -35,5 +35,6 @@ replay_pid*
 .idea/caches/
 .idea/contentModel.xml
 .idea/aws.xml
+.idea/$PROJECT_FILE$
 .junie-plan
 

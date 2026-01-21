@@ -60,7 +60,7 @@ What the starter provides:
 - Outbox & messaging persistence:
   - `io.openleap.starter.core.repository.entity.OutboxEvent`
   - `io.openleap.starter.core.repository.OutboxRepository`
-  - `io.openleap.starter.core.messaging.service.OutboxDispatcher`
+  - `io.openleap.starter.core.messaging.service.OutboxOrchestrator`
   - `io.openleap.starter.core.messaging.service.OutboxAdminService`
   - `io.openleap.starter.core.messaging.service.MetricsService`
 
@@ -78,8 +78,8 @@ What the starter provides:
   - `io.openleap.starter.core.service.IdempotentReplayException`
 
 - Error/response model (API):
-  - `io.openleap.starter.core.api.ErrorCode`
-  - `io.openleap.starter.core.api.ErrorResponse`
+  - `io.openleap.starter.core.api.error.ErrorCode`
+  - `io.openleap.starter.core.api.error.ErrorResponse`
   - `io.openleap.starter.core.api.dto.OlPageableResponseDto`
 
 - Utilities:
@@ -151,7 +151,7 @@ ol:
   - Mode `nosec`: reads plain headers `X-Tenant-Id`, `X-User-Id`, `X-Scopes`, `X-Roles`.
   - Writes to `io.openleap.starter.core.config.IdentityHolder` and clears after completion.
 
-- `io.openleap.starter.core.config.GlobalExceptionHandler` – unified error responses (`ErrorResponse`) for validation problems, bad requests, `ResponseStatusException`, and generic errors, using `io.openleap.starter.core.api.ErrorCode`.
+- `io.openleap.starter.core.config.GlobalExceptionHandler` – unified error responses (`ErrorResponse`) for validation problems, bad requests, `ResponseStatusException`, and generic errors, using `io.openleap.starter.core.api.error.ErrorCode`.
 
 Usage (controller example; no extra setup required):
 
@@ -250,7 +250,7 @@ Commands (simple bus):
 
 - `io.openleap.starter.core.repository.entity.OutboxEvent` – JPA entity (outbox table) with exchange, routing key, payload/headers, status.
 - `io.openleap.starter.core.repository.OutboxRepository` – Spring Data repository (e.g., `findPending()`, `findByPublishedFalse()`).
-- `io.openleap.starter.core.messaging.service.OutboxDispatcher` – background dispatch from outbox to RabbitMQ with publisher confirms, retry/backoff, optional delete on ack.
+- `io.openleap.starter.core.messaging.service.OutboxOrchestrator` – background dispatch from outbox to RabbitMQ with publisher confirms, retry/backoff, optional delete on ack.
 - `io.openleap.starter.core.messaging.service.OutboxAdminService` – admin operations (list unpublished messages, etc.).
 - `io.openleap.starter.core.messaging.service.MetricsService` – aggregates outbox/queue metrics (configurable).
 
@@ -307,8 +307,8 @@ class PaymentService {
 
 ## Error/response model (API)
 
-- `io.openleap.starter.core.api.ErrorCode` – catalog of standard error codes with recommended HTTP status/default messages.
-- `io.openleap.starter.core.api.ErrorResponse` – standardized error response for HTTP and other interfaces.
+- `io.openleap.starter.core.api.error.ErrorCode` – catalog of standard error codes with recommended HTTP status/default messages.
+- `io.openleap.starter.core.api.error.ErrorResponse` – standardized error response for HTTP and other interfaces.
 
 Example (explicit error with catalog code):
 
@@ -317,7 +317,7 @@ class Example {
   void demo() {
     throw new org.springframework.web.server.ResponseStatusException(
       org.springframework.http.HttpStatus.BAD_REQUEST,
-      io.openleap.starter.core.api.ErrorCode.BAD_REQUEST.name() + ": Invalid input"
+      io.openleap.starter.core.api.error.ErrorCode.BAD_REQUEST.name() + ": Invalid input"
     );
   }
 }
