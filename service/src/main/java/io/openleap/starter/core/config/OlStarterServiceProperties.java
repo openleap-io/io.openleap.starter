@@ -57,6 +57,7 @@ public class OlStarterServiceProperties {
         private Registry registry = new Registry();
         private Outbox outbox = new Outbox();
         private Metrics metrics = new Metrics();
+        private Retry retry = new Retry();
 
         public String getEventsExchange() { return eventsExchange; }
         public void setEventsExchange(String eventsExchange) { this.eventsExchange = eventsExchange; }
@@ -70,6 +71,24 @@ public class OlStarterServiceProperties {
         public void setOutbox(Outbox outbox) { this.outbox = outbox; }
         public Metrics getMetrics() { return metrics; }
         public void setMetrics(Metrics metrics) { this.metrics = metrics; }
+        public Retry getRetry() { return retry; }
+        public void setRetry(Retry retry) { this.retry = retry; }
+
+        public static class Retry {
+            private int maxAttempts;
+            private long initialInterval;
+            private double multiplier;
+            private long maxInterval;
+
+            public int getMaxAttempts() { return maxAttempts; }
+            public void setMaxAttempts(int maxAttempts) { this.maxAttempts = maxAttempts; }
+            public long getInitialInterval() { return initialInterval; }
+            public void setInitialInterval(long initialInterval) { this.initialInterval = initialInterval; }
+            public double getMultiplier() { return multiplier; }
+            public void setMultiplier(double multiplier) { this.multiplier = multiplier; }
+            public long getMaxInterval() { return maxInterval; }
+            public void setMaxInterval(long maxInterval) { this.maxInterval = maxInterval; }
+        }
 
         public static class Registry {
             private boolean enabled = false;

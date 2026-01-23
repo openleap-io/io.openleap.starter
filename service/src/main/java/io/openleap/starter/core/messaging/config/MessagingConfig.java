@@ -25,8 +25,11 @@ package io.openleap.starter.core.messaging.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.starter.core.config.OlStarterServiceProperties;
 import io.openleap.starter.core.messaging.MessageCoverageTracker;
+import io.openleap.starter.core.messaging.exception.NonRetryableException;
+import io.openleap.starter.core.messaging.exception.RetryableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -42,6 +45,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.interceptor.RetryInterceptorBuilder;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+
+import java.util.Map;
 
 @Configuration
 public class MessagingConfig {
@@ -183,7 +192,8 @@ public class MessagingConfig {
             ConnectionFactory connectionFactory,
             @Qualifier("starterMessageConverter") MessageConverter converter,
             MessagingIdentityPostProcessor identityPostProcessor,
-            MessagingIdentityClearingAdvice clearingAdvice) {
+            MessagingIdentityClearingAdvice clearingAdvice,
+            OlStarterServiceProperties olStarterServiceProperties) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(converter);
@@ -191,7 +201,43 @@ public class MessagingConfig {
         factory.setMissingQueuesFatal(false);
         // Identity extraction/validation for incoming messages + always clear afterward
         factory.setAfterReceivePostProcessors(identityPostProcessor);
-        factory.setAdviceChain(clearingAdvice);
+        factory.setAdviceChain(
+                RetryInterceptorBuilder.stateless()
+                        .retryOperations(rabbitRetryTemplate(olStarterServiceProperties))
+                        .recoverer((message, cause) -> {
+                            throw new AmqpRejectAndDontRequeueException(cause);
+                        })
+                        .build(),
+                clearingAdvice
+        );
         return factory;
+    }
+
+    @Bean
+    public RetryTemplate rabbitRetryTemplate(OlStarterServiceProperties properties) {
+        Map<Class<? extends Throwable>, Boolean> retryableExceptions = Map.of(
+                NonRetryableException.class, false,
+                IllegalArgumentException.class, false,
+                RetryableException.class, true
+        );
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(
+                        properties.getMessaging().getRetry().getMaxAttempts(),
+                        retryableExceptions,
+                        true,
+                        false
+                );
+        return getRetryTemplate(properties, retryPolicy);
+    }
+
+    private RetryTemplate getRetryTemplate(OlStarterServiceProperties properties, SimpleRetryPolicy retryPolicy) {
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(properties.getMessaging().getRetry().getInitialInterval());
+        backOffPolicy.setMultiplier(properties.getMessaging().getRetry().getMultiplier());
+        backOffPolicy.setMaxInterval(properties.getMessaging().getRetry().getMaxInterval());
+
+        RetryTemplate template = new RetryTemplate();
+        template.setRetryPolicy(retryPolicy);
+        template.setBackOffPolicy(backOffPolicy);
+        return template;
     }
 }
