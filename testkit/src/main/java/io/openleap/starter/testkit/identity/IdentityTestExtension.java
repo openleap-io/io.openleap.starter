@@ -27,7 +27,10 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * JUnit 5 extension to seed and clear IdentityHolder before/after tests.
@@ -36,13 +39,19 @@ public class IdentityTestExtension implements BeforeEachCallback, AfterEachCallb
     @Override
     public void beforeEach(ExtensionContext context) {
         WithTenant ann = context.getElement()
-                .flatMap(el -> el.getAnnotation(WithTenant.class) != null ? java.util.Optional.of(el.getAnnotation(WithTenant.class)) : java.util.Optional.empty())
+                .flatMap(el -> el.getAnnotation(WithTenant.class) != null ? Optional.of(el.getAnnotation(WithTenant.class)) : Optional.empty())
                 .orElseGet(() -> context.getRequiredTestClass().getAnnotation(WithTenant.class));
         if (ann != null) {
             UUID tenant = UUID.fromString(ann.tenant());
             IdentityHolder.setTenantId(tenant);
             if (!ann.user().isEmpty()) {
                 IdentityHolder.setUserId(UUID.fromString(ann.user()));
+            }
+            if (ann.roles().length > 0) {
+                IdentityHolder.setRoles(Arrays.stream(ann.roles()).collect(Collectors.toSet()));
+            }
+            if (ann.scopes().length > 0) {
+                IdentityHolder.setScopes(Arrays.stream(ann.scopes()).collect(Collectors.toSet()));
             }
         }
     }

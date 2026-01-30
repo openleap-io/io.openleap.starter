@@ -22,16 +22,13 @@
  */
 package io.openleap.starter.core.messaging;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
-public class MessageCoverageReport {
-    private int totalMessages;
-    private int coveredMessages;
-    private Set<String> uncoveredMessages;
-    private double coveragePercentage;
+public record MessageCoverageReport(
+        int totalMessages,
+        int coveredMessages,
+        Set<String> uncoveredMessages,
+        double coveragePercentage
+) {
+
 }

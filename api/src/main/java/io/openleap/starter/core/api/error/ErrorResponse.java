@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.api;
+package io.openleap.starter.core.api.error;
 
 import java.time.Instant;
 
@@ -35,7 +35,8 @@ public class ErrorResponse {
     private String traceId;
     private String timestamp;
 
-    public ErrorResponse() {}
+    public ErrorResponse() {
+    }
 
     public ErrorResponse(String code, String message, Object details, String traceId) {
         this.code = code;
@@ -45,18 +46,43 @@ public class ErrorResponse {
         this.timestamp = Instant.now().toString();
     }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
+    public String getCode() {
+        return code;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-    public Object getDetails() { return details; }
-    public void setDetails(Object details) { this.details = details; }
+    public String getMessage() {
+        return message;
+    }
 
-    public String getTraceId() { return traceId; }
-    public void setTraceId(String traceId) { this.traceId = traceId; }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-    public String getTimestamp() { return timestamp; }
-    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+    public Object getDetails() {
+        return details;
+    }
+
+    public void setDetails(Object details) {
+        this.details = details;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 }

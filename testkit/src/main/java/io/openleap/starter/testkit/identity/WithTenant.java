@@ -25,7 +25,6 @@ package io.openleap.starter.testkit.identity;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.*;
-import java.util.UUID;
 
 /**
  * JUnit 5 annotation to seed IdentityHolder with a tenant/user for a test.
@@ -42,4 +41,8 @@ public @interface WithTenant {
     String tenant();
     /** Optional user UUID string. */
     String user() default "";
+    /** Optional roles to assign to the user. */
+    String[] roles() default {};
+    /** Optional scopes to assign to the user. */
+    String[] scopes() default {};
 }
