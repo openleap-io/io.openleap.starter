@@ -29,6 +29,7 @@ import io.openleap.starter.core.messaging.RoutingKey;
 import io.openleap.starter.core.repository.OutboxRepository;
 import io.openleap.starter.core.repository.entity.OutboxEvent;
 import io.openleap.starter.core.messaging.service.OutboxDispatcher;
+import io.openleap.starter.core.repository.entity.OutboxEventId;
 import io.openleap.starter.core.util.OlUuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,7 +97,7 @@ public class EventPublisher {
             hdrs.putIfAbsent("eventId", OlUuid.create().toString());
 
             OutboxEvent e = new OutboxEvent();
-            e.setPublicId(OlUuid.create());
+            e.setBusinessId(OutboxEventId.create());
             e.setExchangeKey(exchangeKey);
             e.setRoutingKey(routingKey.key());
             e.setOccurredAt(Instant.now());
