@@ -39,10 +39,7 @@ import java.util.UUID;
 public class AuditingProviderConfig {
 
     @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> {
-            UUID userId = IdentityHolder.getUserId();
-            return Optional.ofNullable(userId).map(UUID::toString);
-        };
+    public AuditorAware<UUID> auditorProvider() {
+        return () -> Optional.ofNullable(IdentityHolder.getUserId());
     }
 }
