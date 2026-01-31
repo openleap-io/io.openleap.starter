@@ -66,7 +66,7 @@ class OutboxDispatcherUnitTest {
     void dispatch_onPublishFailure_incrementsAttempts_andParksAtMax() throws Exception {
         // Prepare one pending outbox record
         OutboxEvent ob = new OutboxEvent();
-        ob.setId(UUID.randomUUID());
+        ob.setPublicId(UUID.randomUUID());
         ob.setRoutingKey("fi.acc.test");
         ob.setPayloadJson("{\"x\":1}");
         ob.setHeadersJson("{\"h\":\"v\"}");

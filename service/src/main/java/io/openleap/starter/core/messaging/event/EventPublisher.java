@@ -96,7 +96,7 @@ public class EventPublisher {
             hdrs.putIfAbsent("eventId", OlUuid.create().toString());
 
             OutboxEvent e = new OutboxEvent();
-            e.setId(OlUuid.create());
+            e.setPublicId(OlUuid.create());
             e.setExchangeKey(exchangeKey);
             e.setRoutingKey(routingKey.key());
             e.setOccurredAt(Instant.now());

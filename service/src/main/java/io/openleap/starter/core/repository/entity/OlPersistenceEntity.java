@@ -45,15 +45,15 @@ public abstract class OlPersistenceEntity implements Serializable {
 
     @Id
     @Column(
-            name = "pk"
+            name = "id", nullable = false
     )
     @GeneratedValue(
-            strategy = GenerationType.IDENTITY
+            strategy = GenerationType.SEQUENCE
     )
-    private Long pKey;
+    private Long id;
 
-    @Column(name = "uuid")
-    private UUID id;
+    @Column(name = "public_id", nullable = false, unique = true, updatable = false, length = 36)
+    private UUID publicId;
 
 
     @Version
@@ -90,8 +90,8 @@ public abstract class OlPersistenceEntity implements Serializable {
     }
 
     protected OlPersistenceEntity(OlPersistenceEntityBuilder<?, ?> b) {
-        this.pKey = b.pKey;
         this.id = b.id;
+        this.publicId = b.publicId;
         this.version = b.version;
         this.createdAt = b.createdAt;
         this.createdBy = b.createdBy;
@@ -101,8 +101,8 @@ public abstract class OlPersistenceEntity implements Serializable {
 
     @PrePersist
     protected void ensureUuid() {
-        if (this.id == null) {
-            this.id = OlUuid.create();
+        if (this.publicId == null) {
+            this.publicId = OlUuid.create();
         }
     }
 
@@ -123,20 +123,20 @@ public abstract class OlPersistenceEntity implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getpKey() {
-        return pKey;
+    public UUID getPublicId() {
+        return publicId;
     }
 
-    public void setpKey(Long pKey) {
-        this.pKey = pKey;
+    public void setPublicId(UUID publicId) {
+        this.publicId = publicId;
     }
 
     public Instant getUpdatedAt() {
@@ -163,27 +163,22 @@ public abstract class OlPersistenceEntity implements Serializable {
         this.version = version;
     }
 
-    public String getShortId() {
-        if (this.id == null) return null;
-        return OlUuid.toShortBase64(this.id);
-    }
-
     public static abstract class OlPersistenceEntityBuilder<C extends OlPersistenceEntity, B extends OlPersistenceEntityBuilder<C, B>> {
-        private Long pKey;
-        private UUID id;
+        private Long id;
+        private UUID publicId;
         private long version;
         private Instant createdAt;
         private UUID createdBy;
         private Instant updatedAt;
         private UUID updatedBy;
 
-        public B pKey(Long pKey) {
-            this.pKey = pKey;
+        public B id(Long id) {
+            this.id = id;
             return self();
         }
 
-        public B id(UUID id) {
-            this.id = id;
+        public B publicId(UUID publicId) {
+            this.publicId = publicId;
             return self();
         }
 
@@ -217,7 +212,7 @@ public abstract class OlPersistenceEntity implements Serializable {
         public abstract C build();
 
         public String toString() {
-            return "OlPersistenceEntity.OlPersistenceEntityBuilder(pKey=" + this.pKey + ", id=" + this.id + ", version=" + this.version + ", createdAt=" + this.createdAt + ", createdBy=" + this.createdBy + ", lastModifiedAt=" + this.updatedAt + ", lastModifiedBy=" + this.updatedBy + ")";
+            return "OlPersistenceEntity.OlPersistenceEntityBuilder(id=" + this.id + ", publicId=" + this.publicId + ", version=" + this.version + ", createdAt=" + this.createdAt + ", createdBy=" + this.createdBy + ", lastModifiedAt=" + this.updatedAt + ", lastModifiedBy=" + this.updatedBy + ")";
         }
     }
 }
