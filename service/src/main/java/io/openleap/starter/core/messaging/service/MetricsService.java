@@ -43,8 +43,8 @@ import java.util.Map;
 public class MetricsService {
 
     private final OutboxRepository outboxRepository;
+
     private final RabbitTemplate rabbitTemplate;
-    private final OlStarterServiceProperties config;
 
     private String mainQueueName;
 
@@ -53,11 +53,10 @@ public class MetricsService {
     public MetricsService(OlStarterServiceProperties config, OutboxRepository outboxRepository, RabbitTemplate rabbitTemplate) {
         this.outboxRepository = outboxRepository;
         this.rabbitTemplate = rabbitTemplate;
-        this.config = config;
-        if (config == null) return;
+        if (config != null) {
             this.mainQueueName = config.getMessaging().getMetrics().getQueues().getMain();
             this.dlqQueueName = config.getMessaging().getMetrics().getQueues().getDlq();
-
+        }
     }
 
     public Map<String, Object> snapshot() {

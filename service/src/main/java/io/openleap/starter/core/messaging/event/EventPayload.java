@@ -22,6 +22,8 @@
  */
 package io.openleap.starter.core.messaging.event;
 
+import lombok.Getter;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -30,12 +32,23 @@ import java.util.Objects;
  * Generic, minimal message payload used in informational events.
  * Concrete domain payloads should extend this type to keep a consistent envelope.
  */
+// TODO (itaseski): Change class to record
+@Getter
 public class EventPayload {
     private final String aggregateType;
     private final String changeType;
     private final List<String> entityIds;
     private final Long version;
     private final OffsetDateTime occurredAt;
+
+    // Empty payload
+    public EventPayload() {
+        this.aggregateType = null;
+        this.changeType = null;
+        this.entityIds = List.of();
+        this.version = null;
+        this.occurredAt = null;
+    }
 
     public EventPayload(String aggregateType,
                         String changeType,
@@ -48,10 +61,4 @@ public class EventPayload {
         this.version = version;
         this.occurredAt = occurredAt;
     }
-
-    public String getAggregateType() { return aggregateType; }
-    public String getChangeType() { return changeType; }
-    public List<String> getEntityIds() { return entityIds; }
-    public Long getVersion() { return version; }
-    public OffsetDateTime getOccurredAt() { return occurredAt; }
 }

@@ -20,19 +20,16 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.api;
+package io.openleap.starter.core.api.error;
 
 import org.springframework.http.HttpStatus;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Canonical error code catalog. Each code has a default HTTP status and default message.
  * Services should use these codes in ResponseStatusException reasons. GlobalExceptionHandler maps them
  * to a consistent response body {code, message, details, traceId, timestamp}.
  */
-public enum ErrorCode {
+public enum ErrorCode implements OlErrorCode {
     // Generic
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad Request"),
@@ -55,6 +52,7 @@ public enum ErrorCode {
     EVENT_ENQUEUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to enqueue messaging");
 
     private final HttpStatus defaultStatus;
+
     private final String defaultMessage;
 
     ErrorCode(HttpStatus status, String defaultMessage) {
@@ -62,18 +60,14 @@ public enum ErrorCode {
         this.defaultMessage = defaultMessage;
     }
 
-    public HttpStatus status() { return defaultStatus; }
-    public String message() { return defaultMessage; }
-
-    private static final Map<String, ErrorCode> BY_CODE = new HashMap<>();
-    static {
-        for (ErrorCode ec : values()) {
-            BY_CODE.put(ec.name(), ec);
-        }
+    @Override
+    public HttpStatus status() {
+        return defaultStatus;
     }
 
-    public static ErrorCode from(String code) {
-        if (code == null) return null;
-        return BY_CODE.get(code.trim());
+    @Override
+    public String message() {
+        return defaultMessage;
     }
+
 }
