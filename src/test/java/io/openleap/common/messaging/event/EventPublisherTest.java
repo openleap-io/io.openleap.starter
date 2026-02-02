@@ -24,11 +24,11 @@ package io.openleap.common.messaging.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.ReflectionUtils;
-import io.openleap.starter.core.config.OpenleapServiceProperties;
 import io.openleap.common.messaging.RoutingKey;
+import io.openleap.common.messaging.config.OpenleapMessagingProperties;
 import io.openleap.common.messaging.service.OutboxOrchestrator;
-import io.openleap.common.persistence.repository.OutboxRepository;
 import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.persistence.repository.OutboxRepository;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +57,7 @@ class EventPublisherTest {
     private OutboxOrchestrator outboxOrchestrator;
 
     @Mock
-    private OpenleapServiceProperties config;
+    private OpenleapMessagingProperties config;
 
     private EventPublisher eventPublisher;
 

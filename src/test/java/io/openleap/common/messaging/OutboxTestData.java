@@ -11,6 +11,7 @@ public class OutboxTestData {
 
     public static OutboxEvent createEvent() {
         OutboxEvent event = new OutboxEvent();
+        event.setId(1L);
         event.setBusinessId(OutboxEventId.create());
         event.setExchangeKey("test-exchange");
         event.setRoutingKey("test-rk");
