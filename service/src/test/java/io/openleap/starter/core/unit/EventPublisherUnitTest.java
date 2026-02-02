@@ -86,7 +86,7 @@ class EventPublisherUnitTest {
 
         Mockito.verify(outboxRepository).save(captor.capture());
         OutboxEvent e = captor.getValue();
-        assertNotNull(e.getId());
+        assertNotNull(e.getBusinessId());
         assertEquals("fi.acc.test.messaging", e.getRoutingKey());
         assertFalse(e.isPublished());
         assertNotNull(e.getPayloadJson());

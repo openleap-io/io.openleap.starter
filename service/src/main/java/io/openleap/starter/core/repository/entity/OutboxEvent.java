@@ -23,7 +23,9 @@
 
 package io.openleap.starter.core.repository.entity;
 
+import io.openleap.starter.core.domain.DomainEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -40,7 +42,10 @@ import java.time.Instant;
 @Table(name = "outbox")
 @Getter
 @Setter
-public class OutboxEvent extends OlPersistenceEntity {
+public class OutboxEvent extends OlAuditableEntity implements DomainEntity<OutboxEventId> {
+
+    @Embedded
+    private OutboxEventId businessId;
 
     @Column(nullable = false)
     private String exchangeKey;
