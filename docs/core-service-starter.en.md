@@ -25,65 +25,65 @@ All examples assume your service depends on the starter module and uses Spring B
 What the starter provides:
 
 - Auto‑configuration, properties and base configs:
-  - `io.openleap.starter.core.config.CoreServiceConfig`
-  - `io.openleap.starter.core.config.OlStarterServiceProperties`
-  - `io.openleap.starter.core.config.JacksonConfig`
-  - `io.openleap.starter.core.config.OtelConfig`
+  - `io.openleap.starter.core.config.OpenleapServiceConfig`
+  - `io.openleap.starter.core.config.OpenleapServiceProperties`
+  - `util.io.openleap.common.JacksonConfig`
+  - `telemetry.http.io.openleap.common.OtelConfig`
 
 - Web/HTTP infrastructure:
-  - `io.openleap.starter.core.config.TraceIdFilter`
-  - `io.openleap.starter.core.config.IdentityHttpFilter`
+  - `telemetry.http.io.openleap.common.TraceIdFilter`
+  - `identity.security.http.io.openleap.common.IdentityHttpFilter`
   - `io.openleap.starter.core.config.GlobalExceptionHandler`
 
 - Security & identity:
-  - `io.openleap.starter.core.security.SecurityKeycloakConfig`
-  - `io.openleap.starter.core.security.SecurityLoggerConfig`
-  - `io.openleap.starter.core.security.JwtUtils`
-  - `io.openleap.starter.core.config.IdentityHolder`
+  - `security.http.io.openleap.common.SecurityKeycloakConfig`
+  - `security.http.io.openleap.common.SecurityLoggerConfig`
+  - `security.http.io.openleap.common.JwtUtils`
+  - `identity.security.http.io.openleap.common.IdentityHolder`
 
 - Messaging (RabbitMQ):
-  - `io.openleap.starter.core.messaging.config.MessagingConfig`
-  - `io.openleap.starter.core.messaging.RoutingKey`
-  - `io.openleap.starter.core.messaging.event.OlDomainEvent`
-  - `io.openleap.starter.core.messaging.event.EventPayload`
-  - `io.openleap.starter.core.messaging.event.EventPublisher`
-  - `io.openleap.starter.core.messaging.MessageCoverageTracker`
-  - `io.openleap.starter.core.messaging.MessageCoverageReport`
-  - `io.openleap.starter.core.messaging.config.MessagingIdentityPostProcessor`
-  - `io.openleap.starter.core.messaging.config.MessagingIdentityClearingAdvice`
+  - `config.messaging.io.openleap.common.MessagingConfig`
+  - `messaging.io.openleap.common.RoutingKey`
+  - `event.messaging.io.openleap.common.DomainEvent`
+  - `event.messaging.io.openleap.common.EventPayload`
+  - `event.messaging.io.openleap.common.EventPublisher`
+  - `messaging.io.openleap.common.MessageCoverageTracker`
+  - `messaging.io.openleap.common.MessageCoverageReport`
+  - `config.messaging.io.openleap.common.MessagingIdentityPostProcessor`
+  - `config.messaging.io.openleap.common.MessagingIdentityClearingAdvice`
   - Commands (simple command bus):
-    - `io.openleap.starter.core.messaging.command.Command`
-    - `io.openleap.starter.core.messaging.command.CommandHandler`
-    - `io.openleap.starter.core.messaging.command.CommandGateway`
-    - `io.openleap.starter.core.messaging.command.SimpleCommandBus`
+    - `command.messaging.io.openleap.common.Command`
+    - `command.messaging.io.openleap.common.CommandHandler`
+    - `command.messaging.io.openleap.common.CommandGateway`
+    - `command.messaging.io.openleap.common.SimpleCommandBus`
 
 - Outbox & messaging persistence:
-  - `io.openleap.starter.core.repository.entity.OlOutboxEvent`
-  - `io.openleap.starter.core.repository.OutboxRepository`
-  - `io.openleap.starter.core.messaging.service.OutboxOrchestrator`
-  - `io.openleap.starter.core.messaging.service.OutboxAdminService`
-  - `io.openleap.starter.core.messaging.service.MetricsService`
+  - `entity.persistence.io.openleap.common.OutboxEvent`
+  - `repository.persistence.io.openleap.common.OutboxRepository`
+  - `service.messaging.io.openleap.common.OutboxOrchestrator`
+  - `service.messaging.io.openleap.common.OutboxAdminService`
+  - `service.messaging.io.openleap.common.MetricsService`
 
 - JPA & auditing & RLS (row‑level security):
-  - `io.openleap.starter.core.repository.entity.OlPersistenceEntity`
-  - `io.openleap.starter.core.persistence.specification.OlSpecificationBuilder`
-  - `io.openleap.starter.core.repository.config.AuditingProviderConfig`
-  - `io.openleap.starter.core.repository.config.JpaAuditingConfig`
-  - `io.openleap.starter.core.repository.config.TenantRlsAspect`
+  - `entity.persistence.io.openleap.common.PersistenceEntity`
+  - `specification.persistence.io.openleap.common.SpecificationBuilder`
+  - `config.persistence.io.openleap.common.AuditingProviderConfig`
+  - `config.persistence.io.openleap.common.JpaAuditingConfig`
+  - `config.persistence.io.openleap.common.TenantRlsAspect`
 
 - Idempotency:
-  - `io.openleap.starter.core.idempotency.IdempotencyRecordEntity`
-  - `io.openleap.starter.core.idempotency.IdempotencyRecordRepository`
-  - `io.openleap.starter.core.idempotency.IdempotencyRecordService`
-  - `io.openleap.starter.core.idempotency.IdempotentReplayException`
+  - `idempotency.io.openleap.common.IdempotencyRecordEntity`
+  - `idempotency.io.openleap.common.IdempotencyRecordRepository`
+  - `idempotency.io.openleap.common.IdempotencyRecordService`
+  - `idempotency.io.openleap.common.IdempotentReplayException`
 
 - Error/response model (API):
-  - `io.openleap.starter.core.api.error.ErrorCode`
-  - `io.openleap.starter.core.api.error.ErrorResponse`
-  - `io.openleap.starter.core.api.dto.OlPageableResponseDto`
+  - `error.http.io.openleap.common.ErrorCode`
+  - `error.http.io.openleap.common.ErrorResponse`
+  - `api.http.io.openleap.common.PageableResponseDto`
 
 - Utilities:
-  - `io.openleap.starter.core.util.MoneyUtil`
+  - `util.io.openleap.common.MoneyUtil`
 
 Quick start (Maven):
 
@@ -99,9 +99,9 @@ Quick start (Maven):
 
 ## Auto‑configuration & properties
 
-- `io.openleap.starter.core.config.CoreServiceConfig` – enables configuration properties and groups core configs.
+- `io.openleap.starter.core.config.OpenleapServiceConfig` – enables configuration properties and groups core configs.
 
-- `io.openleap.starter.core.config.OlStarterServiceProperties` – central properties under prefix `ol.service`:
+- `io.openleap.starter.core.config.OpenleapServiceProperties` – central properties under prefix `ol.service`:
   - `ol.service.security.mode` (enum `nosec`, `iamsec`): controls identity extraction for HTTP/Messaging.
   - `ol.service.messaging.events-exchange`, `ol.service.messaging.commands-exchange`
   - `ol.service.messaging.coverage` (boolean): enables runtime coverage tracking for sent messages.
@@ -144,14 +144,14 @@ ol:
 
 ## Web/HTTP: tracing, identity, error handling
 
-- `io.openleap.starter.core.config.TraceIdFilter` – sets/propagates `traceId` (MDC) per request.
+- `telemetry.http.io.openleap.common.TraceIdFilter` – sets/propagates `traceId` (MDC) per request.
 
-- `io.openleap.starter.core.config.IdentityHttpFilter` – extracts identity from requests:
+- `identity.security.http.io.openleap.common.IdentityHttpFilter` – extracts identity from requests:
   - Mode `iamsec`: uses JWT from Spring Security context or `X-JWT` header.
   - Mode `nosec`: reads plain headers `X-Tenant-Id`, `X-User-Id`, `X-Scopes`, `X-Roles`.
-  - Writes to `io.openleap.starter.core.config.IdentityHolder` and clears after completion.
+  - Writes to `identity.security.http.io.openleap.common.IdentityHolder` and clears after completion.
 
-- `io.openleap.starter.core.config.GlobalExceptionHandler` – unified error responses (`ErrorResponse`) for validation problems, bad requests, `ResponseStatusException`, and generic errors, using `io.openleap.starter.core.api.error.ErrorCode`.
+- `io.openleap.starter.core.config.GlobalExceptionHandler` – unified error responses (`ErrorResponse`) for validation problems, bad requests, `ResponseStatusException`, and generic errors, using `error.http.io.openleap.common.ErrorCode`.
 
 Usage (controller example; no extra setup required):
 
@@ -172,10 +172,10 @@ class ExampleController {
 
 ## Security & identity utilities
 
-- `io.openleap.starter.core.security.SecurityKeycloakConfig` – default resource‑server security (OAuth2/JWT) with Keycloak.
-- `io.openleap.starter.core.security.SecurityLoggerConfig` – logging helpers.
-- `io.openleap.starter.core.security.JwtUtils` – decode/extract claims from JWT.
-- `io.openleap.starter.core.config.IdentityHolder` – thread‑local holder for `tenantId`, `userId`, `roles`, `scopes`.
+- `security.http.io.openleap.common.SecurityKeycloakConfig` – default resource‑server security (OAuth2/JWT) with Keycloak.
+- `security.http.io.openleap.common.SecurityLoggerConfig` – logging helpers.
+- `security.http.io.openleap.common.JwtUtils` – decode/extract claims from JWT.
+- `identity.security.http.io.openleap.common.IdentityHolder` – thread‑local holder for `tenantId`, `userId`, `roles`, `scopes`.
 
 Note: Mode is controlled via `ol.service.security.mode`.
 
@@ -185,7 +185,7 @@ Note: Mode is controlled via `ol.service.security.mode`.
 
 Configuration/beans:
 
-- `io.openleap.starter.core.messaging.config.MessagingConfig`
+- `config.messaging.io.openleap.common.MessagingConfig`
   - Beans for `TopicExchange` (events/commands)
   - `RabbitTemplate` (with optional coverage interceptor)
   - `starterRabbitListenerContainerFactory` (sets message converter, identity post‑processing, advice)
@@ -193,14 +193,14 @@ Configuration/beans:
 
 Identity for AMQP:
 
-- `io.openleap.starter.core.messaging.config.MessagingIdentityPostProcessor` – extracts identity from headers (`x-tenant-id`, `x-user-id`, `x-jwt`, `x-scopes`, `x-roles`) and validates required fields.
-- `io.openleap.starter.core.messaging.config.MessagingIdentityClearingAdvice` – ensures `IdentityHolder` is cleared after message processing.
+- `config.messaging.io.openleap.common.MessagingIdentityPostProcessor` – extracts identity from headers (`x-tenant-id`, `x-user-id`, `x-jwt`, `x-scopes`, `x-roles`) and validates required fields.
+- `config.messaging.io.openleap.common.MessagingIdentityClearingAdvice` – ensures `IdentityHolder` is cleared after message processing.
 
 Sending events:
 
-- `io.openleap.starter.core.messaging.event.EventPayload` – base type/marker for event payloads.
-- `io.openleap.starter.core.messaging.RoutingKey` – encapsulates routing keys.
-- `io.openleap.starter.core.messaging.event.EventPublisher` – writes events to the Outbox transactionally and triggers the dispatcher (optionally right after commit).
+- `event.messaging.io.openleap.common.EventPayload` – base type/marker for event payloads.
+- `messaging.io.openleap.common.RoutingKey` – encapsulates routing keys.
+- `event.messaging.io.openleap.common.EventPublisher` – writes events to the Outbox transactionally and triggers the dispatcher (optionally right after commit).
 
 Example: publish an event
 
@@ -224,7 +224,7 @@ class OrderService {
 
 Coverage (optional):
 
-- `io.openleap.starter.core.messaging.MessageCoverageTracker` – registers expected and actually sent messages; provides `MessageCoverageReport`.
+- `messaging.io.openleap.common.MessageCoverageTracker` – registers expected and actually sent messages; provides `MessageCoverageReport`.
 
 Listener (consuming):
 
@@ -239,20 +239,20 @@ public void onMessage(OrderCreated event) {
 
 Commands (simple bus):
 
-- `io.openleap.starter.core.messaging.command.Command`
-- `io.openleap.starter.core.messaging.command.CommandHandler`
-- `io.openleap.starter.core.messaging.command.CommandGateway`
-- `io.openleap.starter.core.messaging.command.SimpleCommandBus`
+- `command.messaging.io.openleap.common.Command`
+- `command.messaging.io.openleap.common.CommandHandler`
+- `command.messaging.io.openleap.common.CommandGateway`
+- `command.messaging.io.openleap.common.SimpleCommandBus`
 
 ---
 
 ## Outbox: entities, repository, dispatcher, admin/metrics
 
-- `io.openleap.starter.core.repository.entity.OlOutboxEvent` – JPA entity (outbox table) with exchange, routing key, payload/headers, status.
-- `io.openleap.starter.core.repository.OutboxRepository` – Spring Data repository (e.g., `findPending()`, `findByPublishedFalse()`).
-- `io.openleap.starter.core.messaging.service.OutboxOrchestrator` – background dispatch from outbox to RabbitMQ with publisher confirms, retry/backoff, optional delete on ack.
-- `io.openleap.starter.core.messaging.service.OutboxAdminService` – admin operations (list unpublished messages, etc.).
-- `io.openleap.starter.core.messaging.service.MetricsService` – aggregates outbox/queue metrics (configurable).
+- `entity.persistence.io.openleap.common.OutboxEvent` – JPA entity (outbox table) with exchange, routing key, payload/headers, status.
+- `repository.persistence.io.openleap.common.OutboxRepository` – Spring Data repository (e.g., `findPending()`, `findByPublishedFalse()`).
+- `service.messaging.io.openleap.common.OutboxOrchestrator` – background dispatch from outbox to RabbitMQ with publisher confirms, retry/backoff, optional delete on ack.
+- `service.messaging.io.openleap.common.OutboxAdminService` – admin operations (list unpublished messages, etc.).
+- `service.messaging.io.openleap.common.MetricsService` – aggregates outbox/queue metrics (configurable).
 
 Selected properties:
 
@@ -272,10 +272,10 @@ ol:
 
 ## Repository/JPA & auditing & multi‑tenancy
 
-- `io.openleap.starter.core.repository.entity.OlPersistenceEntity` – base class for entities (e.g., IDs, auditing fields).
-- `io.openleap.starter.core.repository.config.AuditingProviderConfig` – provides `AuditorAware`, etc.
-- `io.openleap.starter.core.repository.config.JpaAuditingConfig` – enables JPA auditing.
-- `io.openleap.starter.core.repository.config.TenantRlsAspect` – AOP/helpers for tenant evaluation/RLS.
+- `entity.persistence.io.openleap.common.PersistenceEntity` – base class for entities (e.g., IDs, auditing fields).
+- `config.persistence.io.openleap.common.AuditingProviderConfig` – provides `AuditorAware`, etc.
+- `config.persistence.io.openleap.common.JpaAuditingConfig` – enables JPA auditing.
+- `config.persistence.io.openleap.common.TenantRlsAspect` – AOP/helpers for tenant evaluation/RLS.
 
 Usage: derive your entities from `OlPersistenceEntity`, enable auditing (starter provides defaults), set tenant via `IdentityHolder`.
 
@@ -283,10 +283,10 @@ Usage: derive your entities from `OlPersistenceEntity`, enable auditing (starter
 
 ## Idempotency
 
-- `io.openleap.starter.core.idempotency.IdempotencyRecordEntity` – stores idempotent operation keys.
-- `io.openleap.starter.core.idempotency.IdempotencyRecordRepository` – access/query idempotency records.
-- `io.openleap.starter.core.idempotency.IdempotencyRecordService` – service logic to check/register keys.
-- `io.openleap.starter.core.idempotency.IdempotentReplayException` – thrown on replay.
+- `idempotency.io.openleap.common.IdempotencyRecordEntity` – stores idempotent operation keys.
+- `idempotency.io.openleap.common.IdempotencyRecordRepository` – access/query idempotency records.
+- `idempotency.io.openleap.common.IdempotencyRecordService` – service logic to check/register keys.
+- `idempotency.io.openleap.common.IdempotentReplayException` – thrown on replay.
 
 Example (simplified):
 
@@ -307,8 +307,8 @@ class PaymentService {
 
 ## Error/response model (API)
 
-- `io.openleap.starter.core.api.error.ErrorCode` – catalog of standard error codes with recommended HTTP status/default messages.
-- `io.openleap.starter.core.api.error.ErrorResponse` – standardized error response for HTTP and other interfaces.
+- `error.http.io.openleap.common.ErrorCode` – catalog of standard error codes with recommended HTTP status/default messages.
+- `error.http.io.openleap.common.ErrorResponse` – standardized error response for HTTP and other interfaces.
 
 Example (explicit error with catalog code):
 
@@ -317,7 +317,7 @@ class Example {
   void demo() {
     throw new org.springframework.web.server.ResponseStatusException(
       org.springframework.http.HttpStatus.BAD_REQUEST,
-      io.openleap.starter.core.api.error.ErrorCode.BAD_REQUEST.name() + ": Invalid input"
+      error.http.io.openleap.common.ErrorCode.BAD_REQUEST.name() + ": Invalid input"
     );
   }
 }
@@ -327,7 +327,7 @@ class Example {
 
 ## Utilities
 
-- `io.openleap.starter.core.util.MoneyUtil` – helpers for monetary amounts/rounding, etc.
+- `util.io.openleap.common.MoneyUtil` – helpers for monetary amounts/rounding, etc.
 
 ---
 
@@ -471,7 +471,7 @@ This section groups the most important files by package and explains when and ho
         .build();
     ```
 
-### Package: `io.openleap.starter.core.repository.entity`
+### Package: `io.openleap.starter.core.persistence.entity`
 
 - `OutboxEvent`
   - What it is: JPA entity representing an event waiting to be dispatched to AMQP (exchange, routing key, payload, headers, attempts).
@@ -485,7 +485,7 @@ This section groups the most important files by package and explains when and ho
   - What it is: Base class providing common persistence/auditing fields.
   - How to use: Extend from it in your own JPA entities to inherit audit fields.
 
-### Package: `io.openleap.starter.core.repository`
+### Package: `io.openleap.starter.core.persistence`
 
 - `OutboxRepository`
   - What it is: Spring Data repository for `OutboxEvent` queries used by the dispatcher.
@@ -509,7 +509,7 @@ This section groups the most important files by package and explains when and ho
   - What it is: Aggregates metrics (e.g., queue length names configured in properties) for observability.
   - How to use: Inject and expose via actuator/custom endpoints.
 
-### Package: `io.openleap.starter.core.repository.config`
+### Package: `io.openleap.starter.core.persistence.config`
 
 - `AuditingProviderConfig`, `JpaAuditingConfig`
   - What it is: Enable and supply Spring Data JPA auditing (createdBy/createdAt, etc.).
