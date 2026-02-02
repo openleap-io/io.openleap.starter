@@ -24,7 +24,7 @@ package io.openleap.starter.core.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "ol.service")
+@ConfigurationProperties(prefix = "ol.idempotency")
 public class OlStarterServiceProperties {
 
     private Messaging messaging = new Messaging();

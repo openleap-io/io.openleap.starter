@@ -20,10 +20,8 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.idempotency;
 
-import io.openleap.starter.core.repository.IdempotencyRecordRepository;
-import io.openleap.starter.core.repository.entity.IdempotencyRecordEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Command-level idempotency service backed by the shared idempotency table.
+ * Command-level idempotency idempotency backed by the shared idempotency table.
  * Stores a unique key per processed command and allows duplicate detection.
  */
 @Service

@@ -23,7 +23,7 @@
 package io.openleap.starter.core.messaging.service;
 
 import io.openleap.starter.core.repository.OutboxRepository;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Administrative helper for Outbox DLQ handling: list parked (failed) records and trigger replay.
@@ -41,7 +40,7 @@ public class OutboxAdminService {
 
     private final OutboxRepository outboxRepository;
 
-    @Value("${ol.starter.service.messaging.outbox.dispatcher.maxAttempts:10}")
+    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.maxAttempts:10}")
     private int maxAttempts;
 
     public OutboxAdminService(OutboxRepository outboxRepository) {
@@ -49,11 +48,11 @@ public class OutboxAdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<OutboxEvent> listFailed(int limit) {
-        List<OutboxEvent> all = outboxRepository.findByPublishedFalse();
+    public List<OlOutboxEvent> listFailed(int limit) {
+        List<OlOutboxEvent> all = outboxRepository.findByPublishedFalse();
         return all.stream()
                 .filter(o -> o.getAttempts() >= maxAttempts && o.getNextAttemptAt() == null)
-                .sorted(Comparator.comparing(OutboxEvent::getCreatedAt))
+                .sorted(Comparator.comparing(OlOutboxEvent::getCreatedAt))
                 .limit(limit > 0 ? limit : Long.MAX_VALUE)
                 .toList();
     }
@@ -61,8 +60,8 @@ public class OutboxAdminService {
     @Transactional
     public int replayFailed(int limit) {
         int count = 0;
-        List<OutboxEvent> all = outboxRepository.findByPublishedFalse();
-        for (OutboxEvent o : all) {
+        List<OlOutboxEvent> all = outboxRepository.findByPublishedFalse();
+        for (OlOutboxEvent o : all) {
             if (o.getAttempts() >= maxAttempts && o.getNextAttemptAt() == null) {
                 if (limit > 0 && count >= limit) break;
                 // Reset attempts and schedule immediate retry

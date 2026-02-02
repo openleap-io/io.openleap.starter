@@ -3,7 +3,7 @@ package io.openleap.starter.core.messaging.service;
 import io.openleap.starter.core.messaging.dispatcher.DispatchResult;
 import io.openleap.starter.core.messaging.dispatcher.OutboxDispatcher;
 import io.openleap.starter.core.repository.OutboxRepository;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,10 @@ public class OutboxProcessor {
 
     private final OutboxDispatcher outboxDispatcher;
 
-    @Value("${ol.starter.service.messaging.outbox.dispatcher.maxAttempts:10}")
+    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.maxAttempts:10}")
     private int maxAttempts;
 
-    @Value("${ol.starter.service.message.deleteOnAck:false}")
+    @Value("${ol.starter.idempotency.message.deleteOnAck:false}")
     private boolean deleteOnAck;
 
     public OutboxProcessor(OutboxRepository outboxRepository, OutboxDispatcher outboxDispatcher) {
@@ -36,9 +36,9 @@ public class OutboxProcessor {
     public void processOutbox() {
         // TODO (itaseski): Explore using a thread pool to process messages in parallel,
         // with a limit, and leverage FOR UPDATE SKIP LOCKED to ensure transactional uniqueness.
-        List<OutboxEvent> pending = outboxRepository.findPending();
+        List<OlOutboxEvent> pending = outboxRepository.findPending();
         log.debug("[Outbox] Found pending size={}", pending.size());
-        for (OutboxEvent ob : pending) {
+        for (OlOutboxEvent ob : pending) {
             // If max attempts exceeded previously and nextAttemptAt is null, consider it parked (DLQ state)
             if (ob.getAttempts() >= maxAttempts && ob.getNextAttemptAt() == null) {
                 // parked - skip
@@ -71,7 +71,7 @@ public class OutboxProcessor {
         }
     }
 
-    private void handlePublishFailure(OutboxEvent ob, String error) {
+    private void handlePublishFailure(OlOutboxEvent ob, String error) {
         int attempts = ob.getAttempts() + 1;
         ob.setAttempts(attempts);
         String safeError = (error == null || error.isBlank()) ? "PUBLISH_FAILED" : error;

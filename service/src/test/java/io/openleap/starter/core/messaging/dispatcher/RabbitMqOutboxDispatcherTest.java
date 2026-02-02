@@ -2,7 +2,7 @@ package io.openleap.starter.core.messaging.dispatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.starter.core.messaging.OutboxTestData;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class RabbitMqOutboxDispatcherTest {
     @DisplayName("Should return success when RabbitMQ returns ACK")
     void dispatch_Success_WhenAckReceived() throws Exception {
         // given
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         setupMockConfirm(true, null);
 
         // when
@@ -60,7 +60,7 @@ class RabbitMqOutboxDispatcherTest {
     @DisplayName("Should return failure with reason when RabbitMQ returns NACK")
     void dispatch_Failure_WhenNackReceived() throws Exception {
         // given
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         setupMockConfirm(false, "Queue capacity reached");
 
         // when
@@ -76,7 +76,7 @@ class RabbitMqOutboxDispatcherTest {
     @DisplayName("Should return failure when confirm times out (confirm is null)")
     void dispatch_Failure_WhenTimeoutOccurs() throws Exception {
         // given
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         setupMockConfirm(false, null);
 
         // when

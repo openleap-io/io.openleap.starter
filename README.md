@@ -53,7 +53,7 @@ mvn -q -DskipTests clean install
 Build a single module, for example `service`:
 
 ```bash
-mvn -q -DskipTests -pl service -am clean install
+mvn -q -DskipTests -pl idempotency -am clean install
 ```
 
 Run tests:

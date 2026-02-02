@@ -17,7 +17,7 @@ import javax.sql.DataSource;
  * BEFORE the transaction is committed. This creates a race condition where
  * another process could acquire the lock while the current database changes
  * are still uncommitted (invisible to others).
- * * Recommended Pattern: Wrap the transactional logic in a service method
+ * * Recommended Pattern: Wrap the transactional logic in a idempotency method
  * and call it from a non-transactional method annotated with @DistributedLock,
  * or use TransactionTemplate inside the locked block to ensure the commit
  * happens before the lock release.

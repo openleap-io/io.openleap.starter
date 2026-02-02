@@ -7,27 +7,27 @@ import jakarta.persistence.Embeddable;
 import java.util.UUID;
 
 @Embeddable
-public record OutboxEventId(
+public record OlOutboxEventId(
         @Column(name = "business_id", nullable = false, updatable = false)
         UUID value
 ) implements OlBusinessId {
 
-    public OutboxEventId {
+    public OlOutboxEventId {
         if (value == null) {
             throw new IllegalArgumentException("OutboxEventId value cannot be null");
         }
     }
 
-    public static OutboxEventId create() {
-        return new OutboxEventId(UUID.randomUUID());
+    public static OlOutboxEventId create() {
+        return new OlOutboxEventId(UUID.randomUUID());
     }
 
-    public static OutboxEventId of(UUID value) {
-        return new OutboxEventId(value);
+    public static OlOutboxEventId of(UUID value) {
+        return new OlOutboxEventId(value);
     }
 
-    public static OutboxEventId parse(String value) {
-        return new OutboxEventId(UUID.fromString(value));
+    public static OlOutboxEventId parse(String value) {
+        return new OlOutboxEventId(UUID.fromString(value));
     }
 
     @Override

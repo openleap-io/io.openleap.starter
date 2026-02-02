@@ -20,9 +20,8 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.repository;
+package io.openleap.starter.core.idempotency;
 
-import io.openleap.starter.core.repository.entity.IdempotencyRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

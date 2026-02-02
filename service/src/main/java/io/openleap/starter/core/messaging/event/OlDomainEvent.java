@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.event;
+package io.openleap.starter.core.messaging.event;
 
 import java.time.Instant;
 import java.util.UUID;

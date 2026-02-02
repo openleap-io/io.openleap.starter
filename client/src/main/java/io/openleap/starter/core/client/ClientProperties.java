@@ -26,7 +26,7 @@ public class ClientProperties {
     /** Enable the client autoconfiguration/usage. */
     private boolean enabled = true;
 
-    /** Base URL of the client service, e.g. http://localhost:8080 */
+    /** Base URL of the client idempotency, e.g. http://localhost:8080 */
     private String baseUrl;
 
 
@@ -42,7 +42,7 @@ public class ClientProperties {
 
 
 
-    /** Authentication mode to use when calling the service */
+    /** Authentication mode to use when calling the idempotency */
     private AuthenticationMode authenticationMode = AuthenticationMode.NONE;
 
     /**

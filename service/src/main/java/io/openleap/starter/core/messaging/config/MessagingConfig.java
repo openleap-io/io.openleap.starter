@@ -152,7 +152,7 @@ public class MessagingConfig {
 
     @Bean
     @ConditionalOnProperty(
-            name = "ol.starter.service.messaging.coverage",
+            name = "ol.starter.idempotency.messaging.coverage",
             havingValue = "true",
             matchIfMissing = false
     )

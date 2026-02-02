@@ -22,7 +22,7 @@ public class OutboxDispatcherConfig {
     public OutboxDispatcher rabbitMqOutboxDispatcher(
             RabbitTemplate rabbitTemplate,
             ObjectMapper objectMapper,
-            @Value("${ol.starter.service.messaging.outbox.dispatcher.confirmTimeoutMillis:5000}") long timeout) {
+            @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.confirmTimeoutMillis:5000}") long timeout) {
         return new RabbitMqOutboxDispatcher(rabbitTemplate, objectMapper, timeout);
     }
 

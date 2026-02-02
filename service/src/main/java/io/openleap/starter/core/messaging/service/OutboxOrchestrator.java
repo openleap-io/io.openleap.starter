@@ -44,10 +44,10 @@ public class OutboxOrchestrator {
 
     private final OutboxProcessor outboxProcessor;
 
-    @Value("${ol.starter.service.messaging.outbox.dispatcher.enabled:true}")
+    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.enabled:true}")
     private boolean enabled;
 
-    @Value("${ol.starter.service.messaging.outbox.dispatcher.fixedDelay:1000}")
+    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.fixedDelay:1000}")
     private long fixedDelayMs;
 
     // Serialize dispatcher execution within this JVM to avoid double sending

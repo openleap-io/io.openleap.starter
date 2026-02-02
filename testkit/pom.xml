@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.openleap.starter</groupId>
         <artifactId>core</artifactId>
-        <version>1.2.7-SNAPSHOT</version>
+        <version>1.3.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>core-testkit</artifactId>
@@ -21,7 +21,7 @@
     </properties>
 
     <dependencies>
-        <!-- Depend on base service to access IdentityHolder and OlPersistenceEntity -->
+        <!-- Depend on base idempotency to access IdentityHolder and OlPersistenceEntity -->
         <dependency>
             <groupId>io.openleap.starter</groupId>
             <artifactId>core-service</artifactId>

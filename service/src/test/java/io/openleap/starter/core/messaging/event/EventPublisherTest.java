@@ -28,7 +28,7 @@ import io.openleap.starter.core.config.OlStarterServiceProperties;
 import io.openleap.starter.core.messaging.RoutingKey;
 import io.openleap.starter.core.messaging.service.OutboxOrchestrator;
 import io.openleap.starter.core.repository.OutboxRepository;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,21 +86,21 @@ class EventPublisherTest {
         eventPublisher.enqueue(routingKey, payload, headers);
 
         // then
-        ArgumentCaptor<OutboxEvent> eventCaptor = ArgumentCaptor.forClass(OutboxEvent.class);
+        ArgumentCaptor<OlOutboxEvent> eventCaptor = ArgumentCaptor.forClass(OlOutboxEvent.class);
         verify(outboxRepository, times(1)).save(eventCaptor.capture());
 
-        OutboxEvent captured = eventCaptor.getValue();
+        OlOutboxEvent captured = eventCaptor.getValue();
 
         assertThat(captured)
                 .as("The outbox event should be correctly mapped and enriched")
-                .returns("test-exchange", OutboxEvent::getExchangeKey)
-                .returns("order.created", OutboxEvent::getRoutingKey)
-                .returns(jsonPayload, OutboxEvent::getPayloadJson)
-                .returns(false, OutboxEvent::isPublished)
-                .returns(0, OutboxEvent::getAttempts)
-                .returns(null, OutboxEvent::getNextAttemptAt)
+                .returns("test-exchange", OlOutboxEvent::getExchangeKey)
+                .returns("order.created", OlOutboxEvent::getRoutingKey)
+                .returns(jsonPayload, OlOutboxEvent::getPayloadJson)
+                .returns(false, OlOutboxEvent::isPublished)
+                .returns(0, OlOutboxEvent::getAttempts)
+                .returns(null, OlOutboxEvent::getNextAttemptAt)
                 // We switch the focus to the Headers string for the final check
-                .extracting(OutboxEvent::getHeadersJson, InstanceOfAssertFactories.STRING)
+                .extracting(OlOutboxEvent::getHeadersJson, InstanceOfAssertFactories.STRING)
                 .contains("custom-header", "test");
     }
 

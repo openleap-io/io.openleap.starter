@@ -23,7 +23,7 @@
  *  Author: Dr. Sören Kemmann
  */
 
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.idempotency;
 
 /**
  * Exception thrown when an idempotency key is reused with a different payload.

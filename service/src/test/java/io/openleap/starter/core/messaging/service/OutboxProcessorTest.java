@@ -5,7 +5,7 @@ import io.openleap.starter.core.messaging.OutboxTestData;
 import io.openleap.starter.core.messaging.dispatcher.DispatchResult;
 import io.openleap.starter.core.messaging.dispatcher.OutboxDispatcher;
 import io.openleap.starter.core.repository.OutboxRepository;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class OutboxProcessorTest {
     @DisplayName("Should mark event as published and clear next attempt when dispatch succeeds")
     void processOutbox_Success_WhenDispatcherReturnsAck() throws Exception {
         // given
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         when(outboxRepository.findPending()).thenReturn(List.of(event));
         when(outboxDispatcher.dispatch(event)).thenReturn(new DispatchResult(true, null));
 
@@ -51,7 +51,7 @@ class OutboxProcessorTest {
 
         // then
         assertThat(event)
-                .extracting(OutboxEvent::isPublished, OutboxEvent::getNextAttemptAt)
+                .extracting(OlOutboxEvent::isPublished, OlOutboxEvent::getNextAttemptAt)
                 .containsExactly(true, null);
 
         verify(outboxRepository, times(1)).save(event);
@@ -63,7 +63,7 @@ class OutboxProcessorTest {
     void processOutbox_Delete_WhenDeleteOnAckEnabled() throws Exception {
         // given
         ReflectionUtils.setField(outboxProcessor, "deleteOnAck", true);
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         when(outboxRepository.findPending()).thenReturn(List.of(event));
         when(outboxDispatcher.dispatch(event)).thenReturn(new DispatchResult(true, null));
 
@@ -79,7 +79,7 @@ class OutboxProcessorTest {
     @DisplayName("Should schedule retry with backoff when dispatch fails")
     void processOutbox_Retry_WhenDispatchFails() throws Exception {
         // given
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         event.setAttempts(1);
         when(outboxRepository.findPending()).thenReturn(List.of(event));
         when(outboxDispatcher.dispatch(event)).thenReturn(new DispatchResult(false, "CONNECTION_TIMEOUT"));
@@ -89,8 +89,8 @@ class OutboxProcessorTest {
 
         // then
         assertThat(event)
-                .returns(2, OutboxEvent::getAttempts)
-                .returns("CONNECTION_TIMEOUT", OutboxEvent::getLastError)
+                .returns(2, OlOutboxEvent::getAttempts)
+                .returns("CONNECTION_TIMEOUT", OlOutboxEvent::getLastError)
                 .satisfies(e -> assertThat(e.getNextAttemptAt()).isAfter(Instant.now()));
 
         verify(outboxRepository).save(event);
@@ -101,7 +101,7 @@ class OutboxProcessorTest {
     void processOutbox_Park_WhenMaxAttemptsExceeded() throws Exception {
         // given
         ReflectionUtils.setField(outboxProcessor, "maxAttempts", 3);
-        OutboxEvent event = OutboxTestData.createEvent();
+        OlOutboxEvent event = OutboxTestData.createEvent();
         // Next failure makes it 3
         event.setAttempts(2);
         when(outboxRepository.findPending()).thenReturn(List.of(event));
@@ -112,9 +112,9 @@ class OutboxProcessorTest {
 
         // then
         assertThat(event)
-                .returns(3, OutboxEvent::getAttempts)
-                .returns(null, OutboxEvent::getNextAttemptAt)
-                .returns("FATAL_ERROR", OutboxEvent::getLastError);
+                .returns(3, OlOutboxEvent::getAttempts)
+                .returns(null, OlOutboxEvent::getNextAttemptAt)
+                .returns("FATAL_ERROR", OlOutboxEvent::getLastError);
 
         verify(outboxRepository).save(event);
     }
@@ -123,7 +123,7 @@ class OutboxProcessorTest {
     @DisplayName("Should skip events that are already parked")
     void processOutbox_Skip_WhenEventIsAlreadyParked() throws Exception {
         // given
-        OutboxEvent parkedEvent = OutboxTestData.createEvent();
+        OlOutboxEvent parkedEvent = OutboxTestData.createEvent();
         parkedEvent.setAttempts(10);
         // Parked state
         parkedEvent.setNextAttemptAt(null);

@@ -42,10 +42,10 @@ import java.time.Instant;
 @Table(name = "outbox")
 @Getter
 @Setter
-public class OutboxEvent extends OlAuditableEntity implements OlDomainEntity<OutboxEventId> {
+public class OlOutboxEvent extends OlAuditableEntity implements OlDomainEntity<OlOutboxEventId> {
 
     @Embedded
-    private OutboxEventId businessId;
+    private OlOutboxEventId businessId;
 
     @Column(nullable = false)
     private String exchangeKey;

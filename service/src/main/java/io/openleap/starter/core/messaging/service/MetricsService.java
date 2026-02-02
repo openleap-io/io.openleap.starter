@@ -24,7 +24,7 @@ package io.openleap.starter.core.messaging.service;
 
 import io.openleap.starter.core.config.OlStarterServiceProperties;
 import io.openleap.starter.core.repository.OutboxRepository;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides lightweight operational metrics for the service, including:
+ * Provides lightweight operational metrics for the idempotency, including:
  * - Outbox backlog and parked (producer DLQ) sizes from the database
  * - Optional RabbitMQ queue depths (main and DLQ) via passive declare, if queue names are configured
  *
@@ -62,8 +62,8 @@ public class MetricsService {
     public Map<String, Object> snapshot() {
         Map<String, Object> m = new HashMap<>();
         // Outbox metrics
-        List<OutboxEvent> pendingNow = outboxRepository.findPending();
-        List<OutboxEvent> allUnpublished = outboxRepository.findByPublishedFalse();
+        List<OlOutboxEvent> pendingNow = outboxRepository.findPending();
+        List<OlOutboxEvent> allUnpublished = outboxRepository.findByPublishedFalse();
         long parked = allUnpublished.stream().filter(o -> o.getNextAttemptAt() == null && o.getAttempts() > 0).count();
         m.put("outbox_pending", pendingNow.size());
         m.put("outbox_unpublished", allUnpublished.size());

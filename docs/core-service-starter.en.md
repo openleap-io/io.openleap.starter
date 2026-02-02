@@ -44,7 +44,7 @@ What the starter provides:
 - Messaging (RabbitMQ):
   - `io.openleap.starter.core.messaging.config.MessagingConfig`
   - `io.openleap.starter.core.messaging.RoutingKey`
-  - `io.openleap.starter.core.event.OlDomainEvent`
+  - `io.openleap.starter.core.messaging.event.OlDomainEvent`
   - `io.openleap.starter.core.messaging.event.EventPayload`
   - `io.openleap.starter.core.messaging.event.EventPublisher`
   - `io.openleap.starter.core.messaging.MessageCoverageTracker`
@@ -58,7 +58,7 @@ What the starter provides:
     - `io.openleap.starter.core.messaging.command.SimpleCommandBus`
 
 - Outbox & messaging persistence:
-  - `io.openleap.starter.core.repository.entity.OutboxEvent`
+  - `io.openleap.starter.core.repository.entity.OlOutboxEvent`
   - `io.openleap.starter.core.repository.OutboxRepository`
   - `io.openleap.starter.core.messaging.service.OutboxOrchestrator`
   - `io.openleap.starter.core.messaging.service.OutboxAdminService`
@@ -72,10 +72,10 @@ What the starter provides:
   - `io.openleap.starter.core.repository.config.TenantRlsAspect`
 
 - Idempotency:
-  - `io.openleap.starter.core.repository.entity.IdempotencyRecordEntity`
-  - `io.openleap.starter.core.repository.IdempotencyRecordRepository`
-  - `io.openleap.starter.core.service.IdempotencyRecordService`
-  - `io.openleap.starter.core.service.IdempotentReplayException`
+  - `io.openleap.starter.core.idempotency.IdempotencyRecordEntity`
+  - `io.openleap.starter.core.idempotency.IdempotencyRecordRepository`
+  - `io.openleap.starter.core.idempotency.IdempotencyRecordService`
+  - `io.openleap.starter.core.idempotency.IdempotentReplayException`
 
 - Error/response model (API):
   - `io.openleap.starter.core.api.error.ErrorCode`
@@ -83,7 +83,7 @@ What the starter provides:
   - `io.openleap.starter.core.api.dto.OlPageableResponseDto`
 
 - Utilities:
-  - `io.openleap.starter.core.service.MoneyUtil`
+  - `io.openleap.starter.core.util.MoneyUtil`
 
 Quick start (Maven):
 
@@ -216,7 +216,7 @@ class OrderService {
     publisher.enqueue(
       RoutingKey.of("order.created"),
       payload,
-      Map.of("source", "order-service")
+      Map.of("source", "order-idempotency")
     );
   }
 }
@@ -248,7 +248,7 @@ Commands (simple bus):
 
 ## Outbox: entities, repository, dispatcher, admin/metrics
 
-- `io.openleap.starter.core.repository.entity.OutboxEvent` – JPA entity (outbox table) with exchange, routing key, payload/headers, status.
+- `io.openleap.starter.core.repository.entity.OlOutboxEvent` – JPA entity (outbox table) with exchange, routing key, payload/headers, status.
 - `io.openleap.starter.core.repository.OutboxRepository` – Spring Data repository (e.g., `findPending()`, `findByPublishedFalse()`).
 - `io.openleap.starter.core.messaging.service.OutboxOrchestrator` – background dispatch from outbox to RabbitMQ with publisher confirms, retry/backoff, optional delete on ack.
 - `io.openleap.starter.core.messaging.service.OutboxAdminService` – admin operations (list unpublished messages, etc.).
@@ -283,10 +283,10 @@ Usage: derive your entities from `OlPersistenceEntity`, enable auditing (starter
 
 ## Idempotency
 
-- `io.openleap.starter.core.repository.entity.IdempotencyRecordEntity` – stores idempotent operation keys.
-- `io.openleap.starter.core.repository.IdempotencyRecordRepository` – access/query idempotency records.
-- `io.openleap.starter.core.service.IdempotencyRecordService` – service logic to check/register keys.
-- `io.openleap.starter.core.service.IdempotentReplayException` – thrown on replay.
+- `io.openleap.starter.core.idempotency.IdempotencyRecordEntity` – stores idempotent operation keys.
+- `io.openleap.starter.core.idempotency.IdempotencyRecordRepository` – access/query idempotency records.
+- `io.openleap.starter.core.idempotency.IdempotencyRecordService` – service logic to check/register keys.
+- `io.openleap.starter.core.idempotency.IdempotentReplayException` – thrown on replay.
 
 Example (simplified):
 
@@ -327,7 +327,7 @@ class Example {
 
 ## Utilities
 
-- `io.openleap.starter.core.service.MoneyUtil` – helpers for monetary amounts/rounding, etc.
+- `io.openleap.starter.core.util.MoneyUtil` – helpers for monetary amounts/rounding, etc.
 
 ---
 
@@ -535,7 +535,7 @@ This section groups the most important files by package and explains when and ho
   - What it is: Generic record for paginated collection responses.
   - How to use: Wrap your response content and pagination metadata.
 
-### Package: `io.openleap.starter.core.service`
+### Package: `io.openleap.starter.core.idempotency`
 
 - `IdempotencyRecordService`
   - What it is: API to guard actions with an idempotency key.

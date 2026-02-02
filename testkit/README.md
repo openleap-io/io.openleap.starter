@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 class ArchitectureComplianceTest {
     @Test
     void entities_extend_base_and_not_exposed() {
-        JavaClasses classes = ArchitectureRules.load("io.openleap.<suite>.<service>");
+        JavaClasses classes = ArchitectureRules.load("io.openleap.<suite>.<idempotency>");
         ArchitectureRules.entitiesExtendOlPersistenceEntity().check(classes);
         ArchitectureRules.controllersDoNotReturnEntities().check(classes);
     }

@@ -21,8 +21,9 @@
  *  You may choose which license to apply.
  */
 
-package io.openleap.starter.core.repository.entity;
+package io.openleap.starter.core.idempotency;
 
+import io.openleap.starter.core.repository.entity.OlPersistenceEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

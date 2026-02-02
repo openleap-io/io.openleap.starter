@@ -1,7 +1,7 @@
 package io.openleap.starter.core.messaging.dispatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
@@ -24,7 +24,7 @@ public class RabbitMqOutboxDispatcher implements OutboxDispatcher {
     }
 
     @Override
-    public DispatchResult dispatch(OutboxEvent event) throws Exception {
+    public DispatchResult dispatch(OlOutboxEvent event) throws Exception {
         String payload = event.getPayloadJson();
         Map<String, Object> headers = parseHeaders(event.getHeadersJson());
         CorrelationData cd = new CorrelationData(event.getId() != null ? event.getId().toString() : null);

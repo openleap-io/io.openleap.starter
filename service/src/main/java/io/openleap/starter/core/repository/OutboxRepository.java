@@ -22,7 +22,7 @@
  */
 package io.openleap.starter.core.repository;
 
-import io.openleap.starter.core.repository.entity.OutboxEvent;
+import io.openleap.starter.core.repository.entity.OlOutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -30,12 +30,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OutboxRepository extends JpaRepository<OutboxEvent, Long> {
+public interface OutboxRepository extends JpaRepository<OlOutboxEvent, Long> {
 
-    @Query("select o from OutboxEvent o where o.published = false and (o.nextAttemptAt is null or o.nextAttemptAt <= CURRENT_TIMESTAMP) order by o.createdAt asc")
-    List<OutboxEvent> findPending();
+    @Query("select o from OlOutboxEvent o where o.published = false and (o.nextAttemptAt is null or o.nextAttemptAt <= CURRENT_TIMESTAMP) order by o.createdAt asc")
+    List<OlOutboxEvent> findPending();
 
     // TODO (itaseski): Some methods do additional stream processing on the result.
     //  Consider adding dedicated queries.
-    List<OutboxEvent> findByPublishedFalse();
+    List<OlOutboxEvent> findByPublishedFalse();
 }

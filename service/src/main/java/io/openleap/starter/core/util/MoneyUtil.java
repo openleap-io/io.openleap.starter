@@ -20,7 +20,7 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.starter.core.service;
+package io.openleap.starter.core.util;
 
 import org.javamoney.moneta.Money;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +38,8 @@ import java.math.BigDecimal;
 @Component
 public class MoneyUtil {
 
-    // Reads base currency from ol.starter.service.money.basecurrency, falls back to acc.baseCurrency, then EUR
-    @Value("${ol.starter.service.money.basecurrency:EUR}")
+    // Reads base currency from ol.starter.idempotency.money.basecurrency, falls back to acc.baseCurrency, then EUR
+    @Value("${ol.starter.idempotency.money.basecurrency:EUR}")
     private String baseCurrency;
 
     public CurrencyUnit currency() {
