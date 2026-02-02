@@ -24,5 +24,5 @@ package io.openleap.starter.core.messaging.command;
 
 /** Gateway for dispatching commands to their handlers. */
 public interface CommandGateway {
-    <R> R send(Command command);
+    <R> R send(OlCommand command);
 }

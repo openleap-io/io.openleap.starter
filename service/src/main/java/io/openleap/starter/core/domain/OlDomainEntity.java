@@ -6,6 +6,6 @@ package io.openleap.starter.core.domain;
  * a non-null business identifier. The ID type is generic to support
  * typed identifiers (e.g., RoleId, UserId, TenantId) for type safety.
  */
-public interface DomainEntity<ID> {
+public interface OlDomainEntity<ID> {
     ID getBusinessId();
 }

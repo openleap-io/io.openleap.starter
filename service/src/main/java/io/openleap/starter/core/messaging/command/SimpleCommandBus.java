@@ -52,8 +52,8 @@ public class SimpleCommandBus implements CommandGateway {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R send(Command command) {
-        CommandHandler<Command, R> handler = (CommandHandler<Command, R>) handlers.get(command.getClass());
+    public <R> R send(OlCommand command) {
+        CommandHandler<OlCommand, R> handler = (CommandHandler<OlCommand, R>) handlers.get(command.getClass());
         if (handler == null) {
             throw new IllegalStateException("No handler for command type: " + command.getClass().getName());
         }

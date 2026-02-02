@@ -25,7 +25,7 @@ package io.openleap.starter.core.messaging.command;
 /**
  * Command handler contract.
  */
-public interface CommandHandler<C extends Command, R> {
+public interface CommandHandler<C extends OlCommand, R> {
     Class<C> commandType();
     R handle(C command);
 }

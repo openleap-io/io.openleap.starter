@@ -1,6 +1,6 @@
 package io.openleap.starter.core.repository.entity;
 
-import io.openleap.starter.core.domain.BusinessId;
+import io.openleap.starter.core.domain.OlBusinessId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 public record OutboxEventId(
         @Column(name = "business_id", nullable = false, updatable = false)
         UUID value
-) implements BusinessId {
+) implements OlBusinessId {
 
     public OutboxEventId {
         if (value == null) {

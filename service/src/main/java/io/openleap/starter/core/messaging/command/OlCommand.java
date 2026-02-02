@@ -23,6 +23,6 @@
 package io.openleap.starter.core.messaging.command;
 
 /** Marker interface for application commands. */
-public interface Command {
-    java.util.UUID commandId();
+public interface OlCommand {
+    OlCommandId commandId();
 }
