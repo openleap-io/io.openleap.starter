@@ -22,13 +22,12 @@
  */
 package io.openleap.common.messaging.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.ReflectionUtils;
 import io.openleap.common.messaging.RoutingKey;
 import io.openleap.common.messaging.config.OpenleapMessagingProperties;
+import io.openleap.common.messaging.entity.OutboxEvent;
+import io.openleap.common.messaging.repository.OutboxRepository;
 import io.openleap.common.messaging.service.OutboxOrchestrator;
-import io.openleap.common.persistence.entity.OutboxEvent;
-import io.openleap.common.persistence.repository.OutboxRepository;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +51,7 @@ class EventPublisherTest {
     private OutboxRepository outboxRepository;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     @Mock
     private OutboxOrchestrator outboxOrchestrator;
@@ -63,7 +63,7 @@ class EventPublisherTest {
 
     @BeforeEach
     void setup() {
-        eventPublisher = new EventPublisher(config, outboxRepository, objectMapper, outboxOrchestrator);
+        eventPublisher = new EventPublisher(config, outboxRepository, jsonMapper, outboxOrchestrator);
 
         ReflectionUtils.setField(eventPublisher, "eventsExchange", "test-exchange");
         ReflectionUtils.setField(eventPublisher, "wakeupAfterCommit", false); // Ignore the synchronization logic
@@ -79,8 +79,8 @@ class EventPublisherTest {
         String jsonHeaders = "{\"custom-header\":\"test\"}";
         String jsonPayload = "{\"type\":\"test\"}";
 
-        when(objectMapper.writeValueAsString(any(EventPayload.class))).thenReturn(jsonPayload);
-        when(objectMapper.writeValueAsString(any(Map.class))).thenReturn(jsonHeaders);
+        when(jsonMapper.writeValueAsString(any(EventPayload.class))).thenReturn(jsonPayload);
+        when(jsonMapper.writeValueAsString(any(Map.class))).thenReturn(jsonHeaders);
 
         // when
         eventPublisher.enqueue(routingKey, payload, headers);

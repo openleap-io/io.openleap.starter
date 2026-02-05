@@ -1,12 +1,14 @@
 package io.openleap.common.messaging.dispatcher;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openleap.common.messaging.dispatcher.logger.LoggingOutboxDispatcher;
+import io.openleap.common.messaging.dispatcher.rabbitmq.RabbitMqOutboxDispatcher;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class OutboxDispatcherConfig {
@@ -21,9 +23,9 @@ public class OutboxDispatcherConfig {
     @ConditionalOnMissingBean(OutboxDispatcher.class)
     public OutboxDispatcher rabbitMqOutboxDispatcher(
             RabbitTemplate rabbitTemplate,
-            ObjectMapper objectMapper,
+            JsonMapper jsonMapper,
             @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.confirmTimeoutMillis:5000}") long timeout) {
-        return new RabbitMqOutboxDispatcher(rabbitTemplate, objectMapper, timeout);
+        return new RabbitMqOutboxDispatcher(rabbitTemplate, jsonMapper, timeout);
     }
 
 }

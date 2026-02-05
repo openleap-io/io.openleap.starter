@@ -22,20 +22,20 @@
  */
 package io.openleap.common.messaging.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.messaging.MessageCoverageTracker;
 import io.openleap.common.messaging.RoutingKey;
 import io.openleap.common.messaging.config.OpenleapMessagingProperties;
-import io.openleap.common.persistence.repository.OutboxRepository;
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.entity.OutboxEvent;
+import io.openleap.common.messaging.entity.OutboxEventId;
+import io.openleap.common.messaging.repository.OutboxRepository;
 import io.openleap.common.messaging.service.OutboxOrchestrator;
-import io.openleap.common.persistence.entity.OutboxEventId;
 import io.openleap.common.util.OpenleapUuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
 import java.util.Map;
@@ -48,7 +48,7 @@ import java.util.Map;
 public class EventPublisher {
 
     private final OutboxRepository outboxRepository;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final OutboxOrchestrator outboxOrchestrator;
 
     // Optional coverage tracker: when enabled, records messages actually enqueued (runtime truth)
@@ -62,9 +62,9 @@ public class EventPublisher {
     private String eventsExchange;
 
     @Autowired
-    public EventPublisher(OpenleapMessagingProperties config, OutboxRepository outboxRepository, ObjectMapper objectMapper, OutboxOrchestrator outboxOrchestrator) {
+    public EventPublisher(OpenleapMessagingProperties config, OutboxRepository outboxRepository, JsonMapper jsonMapper, OutboxOrchestrator outboxOrchestrator) {
         this.outboxRepository = outboxRepository;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.outboxOrchestrator = outboxOrchestrator;
         if (config != null && config.getOutbox() != null) {
             this.coverageEnabled = config.isCoverage();
@@ -74,8 +74,8 @@ public class EventPublisher {
     }
 
     // Backwards-compatible constructor for tests or contexts that don't need immediate dispatch
-    public EventPublisher(OpenleapMessagingProperties config, OutboxRepository outboxRepository, ObjectMapper objectMapper) {
-        this(config, outboxRepository, objectMapper, null);
+    public EventPublisher(OpenleapMessagingProperties config, OutboxRepository outboxRepository, JsonMapper jsonMapper) {
+        this(config, outboxRepository, jsonMapper, null);
     }
 
     @Transactional
@@ -106,8 +106,8 @@ public class EventPublisher {
             e.setPublished(false);
             e.setAttempts(0);
             e.setNextAttemptAt(null);
-            e.setPayloadJson(objectMapper.writeValueAsString(payload));
-            e.setHeadersJson(hdrs.isEmpty() ? null : objectMapper.writeValueAsString(hdrs));
+            e.setPayloadJson(jsonMapper.writeValueAsString(payload));
+            e.setHeadersJson(hdrs.isEmpty() ? null : jsonMapper.writeValueAsString(hdrs));
             outboxRepository.save(e);
 
             // Record coverage with the actual configured exchange + routing key (if enabled)
