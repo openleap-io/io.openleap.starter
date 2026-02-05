@@ -48,7 +48,7 @@ public class OutboxEvent extends AuditableEntity implements DomainEntity<OutboxE
     @Embedded
     private OutboxEventId businessId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 256)
     private String exchangeKey;
 
     @Column(nullable = false, length = 256)
@@ -69,9 +69,9 @@ public class OutboxEvent extends AuditableEntity implements DomainEntity<OutboxE
     @Column(length = 4000)
     private String lastError;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "jsonb")
     private String payloadJson;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "jsonb")
     private String headersJson;
 }
