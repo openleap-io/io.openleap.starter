@@ -21,9 +21,10 @@
  *  You may choose which license to apply.
  */
 
-package io.openleap.common.persistence.entity;
+package io.openleap.common.messaging.entity;
 
 import io.openleap.common.domain.DomainEntity;
+import io.openleap.common.persistence.entity.AuditableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

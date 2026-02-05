@@ -22,8 +22,8 @@
  */
 package io.openleap.common.messaging.service;
 
-import io.openleap.common.persistence.repository.OutboxRepository;
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.repository.OutboxRepository;
+import io.openleap.common.messaging.entity.OutboxEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,66 +1,74 @@
-package io.openleap.common.messaging.dispatcher;
+package io.openleap.common.messaging.dispatcher.rabbitmq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.dispatcher.DispatchResult;
+import io.openleap.common.messaging.dispatcher.OutboxDispatcher;
+import io.openleap.common.messaging.entity.OutboxEvent;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.util.Assert;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class RabbitMqOutboxDispatcher implements OutboxDispatcher {
 
     private final RabbitTemplate rabbitTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final long confirmTimeoutMillis;
 
     public RabbitMqOutboxDispatcher(RabbitTemplate rabbitTemplate,
-                                    ObjectMapper objectMapper,
+                                    JsonMapper jsonMapper,
                                     long confirmTimeoutMillis) {
         this.rabbitTemplate = rabbitTemplate;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.confirmTimeoutMillis = confirmTimeoutMillis;
     }
 
     @Override
     public DispatchResult dispatch(OutboxEvent event) throws Exception {
+        Assert.notNull(event.getId(), "OutboxEvent ID must not be null");
         String payload = event.getPayloadJson();
         Map<String, Object> headers = parseHeaders(event.getHeadersJson());
-        CorrelationData cd = new CorrelationData(event.getId() != null ? event.getId().toString() : null);
+        CorrelationData cd = new CorrelationData(event.getId().toString());
 
         rabbitTemplate.convertAndSend(event.getExchangeKey(), event.getRoutingKey(), payload, message -> {
-            if (headers != null) {
-                for (Map.Entry<String, Object> e : headers.entrySet()) {
-                    message.getMessageProperties().setHeader(e.getKey(), e.getValue());
-                }
-            }
+            message.getMessageProperties().setHeaders(headers);
             // Do not force contentType here; let the MessageConverter decide (JSON or Avro)
             return message;
         }, cd);
 
-        // TODO (itaseski): Handle interrupted exception?
-        // Wait for publisher confirm (synchronous wait)
-        CorrelationData.Confirm confirm = cd.getFuture().get(confirmTimeoutMillis, TimeUnit.MILLISECONDS);
+        CorrelationData.Confirm confirm;
+        try {
+            confirm = cd.getFuture().get(confirmTimeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            confirm = new CorrelationData.Confirm(false, "No confirm (timeout)");
+        }
+        // TODO (itaseski): Consider handling interrupted and execution exceptions separately,
+        //  as they may indicate different issues (e.g., thread interruption vs. execution failure)
 
-        if (confirm != null && confirm.isAck()) {
+        if (confirm.ack()) {
             return DispatchResult.ok();
         } else {
             // Capture the specific reason for the failure
-            String cause = (confirm != null) ? confirm.getReason() : "No confirm (timeout)";
+            String cause = confirm.reason();
             return DispatchResult.fail(cause);
         }
     }
 
     // TODO (itaseski): Null handling seems dubious
+    @SuppressWarnings("unchecked")
     private Map<String, Object> parseHeaders(String json) {
         if (json == null || json.isBlank()) {
-            return null;
+            return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(json, HashMap.class);
+            return jsonMapper.readValue(json, HashMap.class);
         } catch (Exception e) {
-            return null;
+            return Collections.emptyMap();
         }
     }
 }

@@ -1,7 +1,7 @@
 package io.openleap.common.messaging;
 
-import io.openleap.common.persistence.entity.OutboxEvent;
-import io.openleap.common.persistence.entity.OutboxEventId;
+import io.openleap.common.messaging.entity.OutboxEvent;
+import io.openleap.common.messaging.entity.OutboxEventId;
 
 public class OutboxTestData {
 

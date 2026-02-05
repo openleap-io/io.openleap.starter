@@ -1,8 +1,8 @@
 package io.openleap.common.messaging.dispatcher;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.messaging.OutboxTestData;
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.dispatcher.rabbitmq.RabbitMqOutboxDispatcher;
+import io.openleap.common.messaging.entity.OutboxEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -24,14 +25,14 @@ class RabbitMqOutboxDispatcherTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
     private RabbitMqOutboxDispatcher dispatcher;
 
     @BeforeEach
     void setup() {
         long timeout = 1000;
-        dispatcher = new RabbitMqOutboxDispatcher(rabbitTemplate, objectMapper, timeout);
+        dispatcher = new RabbitMqOutboxDispatcher(rabbitTemplate, jsonMapper, timeout);
     }
 
     @Test
@@ -77,7 +78,7 @@ class RabbitMqOutboxDispatcherTest {
     void dispatch_Failure_WhenTimeoutOccurs() throws Exception {
         // given
         OutboxEvent event = OutboxTestData.createEvent();
-        setupMockConfirm(false, null);
+        setupMockTimeoutException();
 
         // when
         DispatchResult result = dispatcher.dispatch(event);
@@ -92,13 +93,27 @@ class RabbitMqOutboxDispatcherTest {
         doAnswer(invocation -> {
             CorrelationData cd = invocation.getArgument(4);
 
-            if (cd != null) {
-                CorrelationData.Confirm confirm = (ack || reason != null)
-                        ? new CorrelationData.Confirm(ack, reason)
-                        : null;
-                // manually complete the future
-                cd.getFuture().complete(confirm);
-            }
+            CorrelationData.Confirm confirm =
+                    new CorrelationData.Confirm(ack, reason);
+
+            // manually complete the future
+            cd.getFuture().complete(confirm);
+
+            return null;
+        }).when(rabbitTemplate).convertAndSend(
+                anyString(),
+                anyString(),
+                any(Object.class),
+                any(MessagePostProcessor.class),
+                any(CorrelationData.class)
+        );
+    }
+
+    private void setupMockTimeoutException() {
+        doAnswer(invocation -> {
+
+            // won't complete future to throw TimeoutException
+
             return null;
         }).when(rabbitTemplate).convertAndSend(
                 anyString(),

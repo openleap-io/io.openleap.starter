@@ -22,7 +22,6 @@
  */
 package io.openleap.common.messaging.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.messaging.MessageCoverageTracker;
 import io.openleap.common.messaging.exception.NonRetryableException;
 import io.openleap.common.messaging.exception.RetryableException;
@@ -31,11 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,12 +44,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.interceptor.RetryInterceptorBuilder;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
-
-import java.util.Map;
+import org.springframework.core.retry.RetryPolicy;
+import org.springframework.core.retry.RetryTemplate;
+import org.springframework.util.backoff.ExponentialBackOff;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class MessagingConfig {
@@ -83,12 +81,12 @@ public class MessagingConfig {
     }
 
     @Bean
-    public Jackson2JsonMessageConverter jackson2JsonMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
+    public JacksonJsonMessageConverter jacksonJsonMessageConverter(JsonMapper jsonMapper) {
+        return new JacksonJsonMessageConverter(jsonMapper);
     }
 
     @Bean
-    public MessageConverter starterMessageConverter(Jackson2JsonMessageConverter jsonConverter) {
+    public MessageConverter starterMessageConverter(JacksonJsonMessageConverter jsonConverter) {
         boolean registryEnabled = olStarterServiceProperties != null
                 && olStarterServiceProperties.getRegistry() != null
                 && olStarterServiceProperties.getRegistry().isEnabled();
@@ -200,43 +198,40 @@ public class MessagingConfig {
         factory.setMissingQueuesFatal(false);
         // Identity extraction/validation for incoming messages + always clear afterward
         factory.setAfterReceivePostProcessors(identityPostProcessor);
+        // TODO (itaseski): Check the use of StatelessRetryOperationsInterceptor and StatefulRetryOperationsInterceptor
         factory.setAdviceChain(
                 RetryInterceptorBuilder.stateless()
-                        .retryOperations(rabbitRetryTemplate(olStarterServiceProperties))
+                        .retryPolicy(retryPolicy(olStarterServiceProperties))
                         .recoverer((message, cause) -> {
                             throw new AmqpRejectAndDontRequeueException(cause);
                         })
                         .build(),
-                clearingAdvice
-        );
+                clearingAdvice);
         return factory;
     }
 
+    // TODO (itaseski): Check the use of RabbitTemplateRetrySettingsCustomizer and RabbitListenerRetrySettingsCustomizer
     @Bean
     public RetryTemplate rabbitRetryTemplate(OpenleapMessagingProperties properties) {
-        Map<Class<? extends Throwable>, Boolean> retryableExceptions = Map.of(
-                NonRetryableException.class, false,
-                IllegalArgumentException.class, false,
-                RetryableException.class, true
-        );
-        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(
-                        properties.getRetry().getMaxAttempts(),
-                        retryableExceptions,
-                        true,
-                        false
-                );
-        return getRetryTemplate(properties, retryPolicy);
-    }
-
-    private RetryTemplate getRetryTemplate(OpenleapMessagingProperties properties, SimpleRetryPolicy retryPolicy) {
-        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(properties.getRetry().getInitialInterval());
-        backOffPolicy.setMultiplier(properties.getRetry().getMultiplier());
-        backOffPolicy.setMaxInterval(properties.getRetry().getMaxInterval());
+        RetryPolicy retryPolicy = retryPolicy(properties);
 
         RetryTemplate template = new RetryTemplate();
         template.setRetryPolicy(retryPolicy);
-        template.setBackOffPolicy(backOffPolicy);
         return template;
+    }
+
+    private RetryPolicy retryPolicy(OpenleapMessagingProperties properties) {
+        ExponentialBackOff backoff = new ExponentialBackOff();
+        backoff.setInitialInterval(properties.getRetry().getInitialInterval());
+        backoff.setMultiplier(properties.getRetry().getMultiplier());
+        backoff.setMaxInterval(properties.getRetry().getMaxInterval());
+
+        return RetryPolicy.builder()
+                .maxRetries(properties.getRetry().getMaxAttempts())
+                .includes(RetryableException.class)
+                .excludes(NonRetryableException.class, IllegalArgumentException.class)
+                // TODO (itaseski): Should set delay?
+                .backOff(backoff)
+                .build();
     }
 }

@@ -1,4 +1,4 @@
-package io.openleap.common.persistence.entity;
+package io.openleap.common.messaging.entity;
 
 import io.openleap.common.domain.BusinessId;
 import jakarta.persistence.Column;
