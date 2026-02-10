@@ -23,8 +23,6 @@
 package io.openleap.common.util;
 
 import org.javamoney.moneta.Money;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
@@ -35,21 +33,21 @@ import java.math.BigDecimal;
  * Utility component to convert between BigDecimal persistence values and JSR 354 MonetaryAmount
  * using the configured base currency (acc.baseCurrency).
  */
-@Component
-public class MoneyUtil {
+public class MoneyUtils {
 
-    // Reads base currency from ol.starter.idempotency.money.basecurrency, falls back to acc.baseCurrency, then EUR
-    @Value("${ol.starter.idempotency.money.basecurrency:EUR}")
-    private String baseCurrency;
+    private final String baseCurrency;
 
-    public CurrencyUnit currency() {
-        String cur = baseCurrency;
-        return Monetary.getCurrency(cur == null || cur.isBlank() ? "EUR" : cur);
+    public MoneyUtils(String baseCurrency) {
+        this.baseCurrency = baseCurrency;
+    }
+
+    public CurrencyUnit currency(String baseCurrency) {
+        return Monetary.getCurrency(baseCurrency == null || baseCurrency.isBlank() ? "EUR" : baseCurrency);
     }
 
     public MonetaryAmount of(BigDecimal amount) {
         if (amount == null) return null;
-        return Money.of(amount, currency());
+        return Money.of(amount, currency(baseCurrency));
     }
 
     public BigDecimal toBigDecimal(MonetaryAmount amount) {
@@ -58,7 +56,7 @@ public class MoneyUtil {
     }
 
     public MonetaryAmount zero() {
-        return Money.of(BigDecimal.ZERO, currency());
+        return Money.of(BigDecimal.ZERO, currency(baseCurrency));
     }
 
     public boolean isZero(MonetaryAmount amount) {

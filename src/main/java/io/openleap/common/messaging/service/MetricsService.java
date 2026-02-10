@@ -22,7 +22,7 @@
  */
 package io.openleap.common.messaging.service;
 
-import io.openleap.common.messaging.config.OpenleapMessagingProperties;
+import io.openleap.common.messaging.config.MessagingProperties;
 import io.openleap.common.messaging.repository.OutboxRepository;
 import io.openleap.common.messaging.entity.OutboxEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -50,7 +50,7 @@ public class MetricsService {
 
     private String dlqQueueName;
 
-    public MetricsService(OpenleapMessagingProperties config, OutboxRepository outboxRepository, RabbitTemplate rabbitTemplate) {
+    public MetricsService(MessagingProperties config, OutboxRepository outboxRepository, RabbitTemplate rabbitTemplate) {
         this.outboxRepository = outboxRepository;
         this.rabbitTemplate = rabbitTemplate;
         if (config != null) {

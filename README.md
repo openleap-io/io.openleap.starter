@@ -1,127 +1,224 @@
-# OpenLeap Starter
+# OpenLeap Core-Service Starter
 
-OpenLeap Starter is a core library for building microservices with Spring Boot. It provides a set of common features, pre-configured for consistency across the OpenLeap ecosystem.
+A Spring Boot starter library providing common infrastructure for building microservices in the OpenLeap ecosystem.
 
-## Project Structure (Separation of Concerns)
+## Quick Start
 
-The project is structured by **feature**, following the principle of separation of concerns. Each feature is encapsulated within its own package under `io.openleap.common`.
+Add the dependency to your `pom.xml`:
 
-Core features include:
-- **HTTP / Security**: Authentication, identity management, and error handling for web requests.
-- **Messaging**: RabbitMQ integration, event/command bus, and outbox pattern.
-- **Persistence**: JPA base entities, auditing, and specification builders.
-- **Lock**: Distributed locking mechanism using a database.
-- **Idempotency**: Mechanism to handle duplicate requests.
-- **Telemetry**: OpenTelemetry integration for tracing.
-- **Utils**: Common utility classes (e.g., Jackson configuration, Money utilities).
+```xml
+<dependency>
+    <groupId>io.openleap.common</groupId>
+    <artifactId>core-service</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+</dependency>
+```
 
----
+Enable features using annotations:
 
-## Configuration & Properties Pattern
-
-Each feature in OpenLeap Starter typically follows a consistent configuration pattern:
-
-1.  **Properties File (`*Properties.java`)**:
-    *   Captures all configurable parameters for the respective feature.
-    *   Annotated with `@ConfigurationProperties(prefix = "ol.<feature>")`.
-    *   Provides type-safe access to application properties (e.g., from `application.yml`).
-2.  **Config File (`*Config.java`)**:
-    *   Bootstraps the feature's components (beans) into the Spring context.
-    *   Annotated with `@Configuration` and often `@EnableConfigurationProperties(<Feature>Properties.class)`.
-    *   Uses `@ConditionalOnProperty` or `@Profile` to enable/disable features based on configuration.
-
-This approach ensures that each feature is self-contained and easily configurable.
+```java
+@SpringBootApplication
+@EnableOpenLeapSecurity
+@EnableOpenLeapMessaging
+@EnableOpenLeapErrorHandling
+@EnableOpenLeapAuditingJpa
+@EnableOpenLeapDistributedLocking
+@EnableOpenLeapIdempotency
+@EnableOpenLeapTelemetry
+public class MyServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MyServiceApplication.class, args);
+    }
+}
+```
 
 ---
 
 ## Features
 
-### 1. HTTP & Security
-Located in `io.openleap.common.http`.
-
-*   **Security Mode**: Controlled by `ol.security.mode`.
-    *   `nosec`: Plain identity info in headers (`X-Tenant-Id`, `X-User-Id`).
-    *   `iamsec`: JWT-based security (Bearer token or `X-JWT` header).
-*   **Identity**: `IdentityHolder` provides static access to the current user's identity (User ID, Tenant ID, Roles) throughout the request lifecycle.
-*   **Error Handling**: Global exception handling with a standardized `ErrorResponse` and `ErrorCode`.
-
-**Configuration**:
-- `OpenleapSecurityConfig` / `OpenleapSecurityProperties` (prefix: `ol.security`)
-- `SecurityKeycloakConfig` (active under `keycloak` profile)
-- `SecurityLoggerConfig` (active under `nosec` or `logger` profiles)
-
-### 2. Messaging (RabbitMQ)
-Located in `io.openleap.common.messaging`.
-
-Provides a robust messaging infrastructure using RabbitMQ, supporting both Events and Commands.
-
-*   **Domain Events**: Base classes for creating and publishing domain events.
-*   **Command Bus**: Simple implementation for handling commands asynchronously.
-*   **Outbox Pattern**: Ensures "at-least-once" delivery by persisting messages in the database before publishing them to RabbitMQ.
-*   **Identity Propagation**: Automatically carries user identity across messaging boundaries.
-
-**Configuration**:
-- `OpenleapMessagingConfig` / `OpenleapMessagingProperties` (prefix: `ol.messaging`)
-- `MessagingConfig`: Core RabbitMQ setup (exchanges, converters, retry templates).
-- `OutboxDispatcherConfig`: Configuration for the outbox message dispatcher.
-
-### 3. Persistence
-Located in `io.openleap.common.persistence`.
-
-*   **Base Entities**: `PersistenceEntity` provides common fields like ID, version, and auditing timestamps.
-*   **Auditing**: Automatic population of `@CreatedBy` and `@LastModifiedBy` using the current identity from `IdentityHolder`.
-*   **Specifications**: `SpecificationBuilder` for dynamic JPA queries.
-
-**Configuration**:
-- `JpaAuditingConfig`: Enables Spring Data JPA auditing.
-- `AuditingProviderConfig`: Provides the `AuditorAware` bean linked to `IdentityHolder`.
-
-### 4. Distributed Lock
-Located in `io.openleap.common.lock`.
-
-Provides a `@DistributedLock` annotation to prevent concurrent execution of critical sections across multiple service instances.
-
-**Configuration**:
-- `DistributedLockConfig`: Configures the `LockRepository` and the aspect.
-
-### 5. Idempotency
-Located in `io.openleap.common.idempotency`.
-
-Prevents duplicate processing of the same request by recording request IDs and their outcomes.
-
-### 6. Telemetry
-Located in `io.openleap.common.http.telemetry`.
-
-Optional OpenTelemetry integration for distributed tracing.
-
-**Configuration**:
-- `OtelConfig`: Enabled via `ol.starter.tracing.otel.enabled=true`.
-
-### 7. Utilities
-Located in `io.openleap.common.util`.
-
-*   **JacksonConfig**: Configures Jackson with `JavaTimeModule` and `MoneyModule`.
-*   **MoneyUtil**: Utilities for handling monetary values consistently.
+| Feature | Package | Enable Annotation |
+|---------|---------|-------------------|
+| HTTP & Security | `io.openleap.common.http` | `@EnableOpenLeapSecurity` |
+| Error Handling | `io.openleap.common.http.error` | `@EnableOpenLeapErrorHandling` |
+| Messaging | `io.openleap.common.messaging` | `@EnableOpenLeapMessaging` |
+| Persistence | `io.openleap.common.persistence` | `@EnableOpenLeapAuditingJpa` |
+| Distributed Lock | `io.openleap.common.lock` | `@EnableOpenLeapDistributedLocking` |
+| Idempotency | `io.openleap.common.idempotency` | `@EnableOpenLeapIdempotency` |
+| Telemetry | `io.openleap.common.http.telemetry` | `@EnableOpenLeapTelemetry` |
 
 ---
 
-## Usage
+## Configuration
 
-To use this starter in your microservice, add the dependency to your `pom.xml`:
+### Security (`ol.security`)
 
-```xml
-<dependency>
-    <groupId>io.openleap.starter</groupId>
-    <artifactId>service</artifactId>
-    <version>${openleap.starter.version}</version>
-</dependency>
-```
+| Property | Default | Description |
+|----------|---------|-------------|
+| `mode` | `nosec` | Security mode: `nosec` or `iamsec` |
 
-Then, configure the desired features in your `application.yml`. For example, to configure messaging:
+- **`nosec`**: Identity via headers (`X-Tenant-Id`, `X-User-Id`, `X-Scopes`, `X-Roles`)
+- **`iamsec`**: JWT-based security (Bearer token or `X-JWT` header)
+
+### Messaging (`ol.messaging`)
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `enabled` | `false` | Enable messaging feature (required) |
+| `events-exchange` | `ol.exchange.events` | RabbitMQ exchange for events |
+| `coverage` | `false` | Enable message coverage tracking |
+| `outbox.dispatcher.enabled` | `true` | Enable outbox dispatcher |
+| `outbox.dispatcher.type` | `rabbitmq` | Dispatcher type: `rabbitmq` or `logger` |
+| `outbox.dispatcher.fixed-delay` | `1000` | Polling interval (ms) |
+| `outbox.dispatcher.wakeup-after-commit` | `true` | Wake dispatcher after commit |
+| `outbox.dispatcher.max-attempts` | `10` | Max dispatch attempts |
+| `outbox.dispatcher.delete-on-ack` | `false` | Delete events after dispatch |
+| `outbox.dispatcher.confirm-timeout-millis` | `5000` | Publisher confirm timeout |
+| `retry.max-attempts` | `3` | Message retry attempts |
+| `retry.initial-interval` | `1000` | Initial retry interval (ms) |
+| `retry.multiplier` | `2.0` | Retry backoff multiplier |
+| `retry.max-interval` | `10000` | Max retry interval (ms) |
+
+### Telemetry (`ol.tracing.otel`)
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `enabled` | `false` | Enable OpenTelemetry |
+| `endpoint` | `http://localhost:4317` | OTLP exporter endpoint |
+
+### Example `application.yml`
 
 ```yaml
 ol:
+  security:
+    mode: ${OL_SECURITY_MODE:nosec}
   messaging:
-    events-exchange: "my-service.events"
-    commands-exchange: "my-service.commands"
+    enabled: true
+    events-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.events}
+    outbox:
+      dispatcher:
+        enabled: true
+        type: rabbitmq
+        fixed-delay: 1000
+        max-attempts: 10
+    retry:
+      max-attempts: 3
+      initial-interval: 1000
+  tracing:
+    otel:
+      enabled: ${OL_OTEL_ENABLED:false}
+      endpoint: ${OL_OTEL_ENDPOINT:http://localhost:4317}
 ```
+
+---
+
+## Key Components
+
+### Identity Management
+
+```java
+// Access identity anywhere in request lifecycle
+UUID tenantId = IdentityHolder.getTenantId();
+UUID userId = IdentityHolder.getUserId();
+Set<String> roles = IdentityHolder.getRoles();
+
+// Or inject via annotation
+@GetMapping("/orders")
+public List<Order> getOrders(@IdentityContext AuthenticatedIdentity identity) {
+    return orderService.findByTenant(identity.tenantId());
+}
+```
+
+### Event Publishing (Outbox Pattern)
+
+```java
+@Service
+public class OrderService {
+    private final EventPublisher publisher;
+
+    @Transactional
+    public void placeOrder(Order order) {
+        orderRepository.save(order);
+        publisher.enqueue(
+            RoutingKey.of("order.created"),
+            new OrderCreatedEvent(order.getId())
+        );
+    }
+}
+```
+
+### Message Consumption
+
+```java
+@RabbitListener(
+    queues = "orders.queue",
+    containerFactory = "starterRabbitListenerContainerFactory"
+)
+public void onOrderCreated(OrderCreatedEvent event) {
+    // IdentityHolder is automatically populated from AMQP headers
+    UUID tenantId = IdentityHolder.getTenantId();
+}
+```
+
+### Distributed Locking
+
+```java
+@DistributedLock(key = "payment-processing")
+public void processPayments() {
+    // Only one instance executes this at a time
+}
+
+@DistributedLock(keyExpression = "'order-' + #orderId", failOnConcurrentExecution = true)
+public void processOrder(String orderId) {
+    // Lock per order ID
+}
+```
+
+### Idempotency
+
+```java
+@Transactional
+public void processPayment(String paymentId, PaymentCommand cmd) {
+    if (idempotencyService.alreadyProcessed(paymentId)) {
+        throw new IdempotentReplayException("Already processed: " + paymentId);
+    }
+    Payment payment = doProcessPayment(cmd);
+    idempotencyService.markProcessed(paymentId, "payment", payment.getId());
+}
+```
+
+### Persistence
+
+```java
+// Entity hierarchy: PersistenceEntity → AuditableEntity → VersionedEntity
+
+// Dynamic queries with SpecificationBuilder
+Specification<Order> spec = SpecificationBuilder.<Order>create()
+    .equal("status", OrderStatus.PENDING)
+    .like("customerName", searchTerm)
+    .greaterThan("createdAt", startDate)
+    .build();
+```
+
+---
+
+## Database Migrations
+
+Flyway scripts are provided in `src/main/resources/db/migration/`:
+
+| Script | Description |
+|--------|-------------|
+| `V1__create_outbox_table.sql` | Outbox event table |
+| `V2__create_idempotency_table.sql` | Idempotency record table |
+
+---
+
+## Documentation
+
+For detailed documentation, see [docs/core-service-starter.en.md](docs/core-service-starter.en.md).
+
+---
+
+## License
+
+Dual-licensed under EUPL v1.2 and commercial license. See [license.txt](license.txt) for details.
+

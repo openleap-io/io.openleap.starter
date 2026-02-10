@@ -37,11 +37,11 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.retry.RetryPolicy;
@@ -50,34 +50,25 @@ import org.springframework.util.backoff.ExponentialBackOff;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
+@EnableConfigurationProperties(MessagingProperties.class)
+@ConditionalOnProperty(prefix = "ol.messaging", name = "enabled", havingValue = "true")
 public class MessagingConfig {
 
     private static final Logger log = LoggerFactory.getLogger(MessagingConfig.class);
 
-    @Value("${ol.service.messaging.events-exchange:ol.exchange.events}")
-    public String EVENTS_EXCHANGE;
+    private final MessageCoverageTracker coverageTracker;
 
-    @Value("${ol.service.messaging.commands-exchange:ol.exchange.commands}")
-    public String COMMANDS_EXCHANGE;
+    private final MessagingProperties olStarterServiceProperties;
 
-    @Autowired
-    private MessageCoverageTracker coverageTracker;
-
-    @Autowired(required = false)
-    private OpenleapMessagingProperties olStarterServiceProperties;
-
-    @Bean
-    public TopicExchange eventsExchange() {
-        if (olStarterServiceProperties != null)
-            return new TopicExchange(olStarterServiceProperties.getEventsExchange(), true, false);
-        return new TopicExchange(EVENTS_EXCHANGE, true, false);
+    public MessagingConfig(MessageCoverageTracker coverageTracker,
+                           MessagingProperties olStarterServiceProperties) {
+        this.coverageTracker = coverageTracker;
+        this.olStarterServiceProperties = olStarterServiceProperties;
     }
 
     @Bean
-    public TopicExchange commandsExchange() {
-        if (olStarterServiceProperties != null)
-            return new TopicExchange(olStarterServiceProperties.getCommandsExchange(), true, false);
-        return new TopicExchange(COMMANDS_EXCHANGE, true, false);
+    public TopicExchange eventsExchange() {
+        return new TopicExchange(olStarterServiceProperties.getEventsExchange(), true, false);
     }
 
     @Bean
@@ -85,11 +76,14 @@ public class MessagingConfig {
         return new JacksonJsonMessageConverter(jsonMapper);
     }
 
+    // TODO (itaseski): This method is outdated and currently there is no avro support in the starter.
+    // Specifically, 'org.springframework.cloud.stream.schema.avro.AvroSchemaMessageConverter'
+    // is missing from the classpath. This manual reflection-based logic should be removed
     @Bean
+    @ConditionalOnClass(name = "org.springframework.cloud.stream.schema.avro.AvroSchemaMessageConverter")
+    @Deprecated
     public MessageConverter starterMessageConverter(JacksonJsonMessageConverter jsonConverter) {
-        boolean registryEnabled = olStarterServiceProperties != null
-                && olStarterServiceProperties.getRegistry() != null
-                && olStarterServiceProperties.getRegistry().isEnabled();
+        boolean registryEnabled = olStarterServiceProperties.getRegistry().isEnabled();
         if (!registryEnabled) {
             return jsonConverter;
         }
@@ -103,7 +97,7 @@ public class MessagingConfig {
                 String url = olStarterServiceProperties.getRegistry().getUrl();
                 if (url != null && !url.isBlank()) {
                     // Create a default client if available (implementation varies by version). If not, fallback to JSON.
-                    Object client = null;
+                    Object client;
                     try {
                         Class<?> impl = Class.forName("org.springframework.cloud.schema.registry.client.DefaultSchemaRegistryClient");
                         client = impl.getDeclaredConstructor().newInstance();
@@ -149,29 +143,30 @@ public class MessagingConfig {
 
     @Bean
     @ConditionalOnProperty(
-            name = "ol.starter.idempotency.messaging.coverage",
-            havingValue = "true",
-            matchIfMissing = false
+            name = "ol.messaging.coverage",
+            havingValue = "true"
     )
-    public RabbitTemplate rabbitTemplateCoverage(ConnectionFactory connectionFactory, @Qualifier("starterMessageConverter") MessageConverter converter) {
+    public RabbitTemplate rabbitTemplateCoverage(ConnectionFactory connectionFactory, MessageConverter converter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(converter);
         template.setMandatory(true);
         // Add interceptor to track sent messages
-        template.setBeforePublishPostProcessors(message -> {
-            MessageProperties props = message.getMessageProperties();
-            String exchange = props.getReceivedExchange();
-            String routingKey = props.getReceivedRoutingKey();
-            coverageTracker.recordSentMessage(exchange, routingKey);
-            return message;
-        });
+        if (coverageTracker != null) {
+            template.setBeforePublishPostProcessors(message -> {
+                MessageProperties props = message.getMessageProperties();
+                String exchange = props.getReceivedExchange();
+                String routingKey = props.getReceivedRoutingKey();
+                coverageTracker.recordSentMessage(exchange, routingKey);
+                return message;
+            });
+        }
         // Confirm and returns callbacks are used by the dispatcher via CorrelationData futures as well
         return template;
     }
 
     @Bean
     @ConditionalOnMissingBean(RabbitTemplate.class)
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, @Qualifier("starterMessageConverter") MessageConverter converter) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter converter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(converter);
         template.setMandatory(true);
@@ -187,10 +182,10 @@ public class MessagingConfig {
     @Bean(name = "starterRabbitListenerContainerFactory")
     public SimpleRabbitListenerContainerFactory starterRabbitListenerContainerFactory(
             ConnectionFactory connectionFactory,
-            @Qualifier("starterMessageConverter") MessageConverter converter,
+            MessageConverter converter,
             MessagingIdentityPostProcessor identityPostProcessor,
             MessagingIdentityClearingAdvice clearingAdvice,
-            OpenleapMessagingProperties olStarterServiceProperties) {
+            MessagingProperties olStarterServiceProperties) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(converter);
@@ -212,7 +207,7 @@ public class MessagingConfig {
 
     // TODO (itaseski): Check the use of RabbitTemplateRetrySettingsCustomizer and RabbitListenerRetrySettingsCustomizer
     @Bean
-    public RetryTemplate rabbitRetryTemplate(OpenleapMessagingProperties properties) {
+    public RetryTemplate rabbitRetryTemplate(MessagingProperties properties) {
         RetryPolicy retryPolicy = retryPolicy(properties);
 
         RetryTemplate template = new RetryTemplate();
@@ -220,14 +215,14 @@ public class MessagingConfig {
         return template;
     }
 
-    private RetryPolicy retryPolicy(OpenleapMessagingProperties properties) {
+    private RetryPolicy retryPolicy(MessagingProperties properties) {
         ExponentialBackOff backoff = new ExponentialBackOff();
         backoff.setInitialInterval(properties.getRetry().getInitialInterval());
         backoff.setMultiplier(properties.getRetry().getMultiplier());
         backoff.setMaxInterval(properties.getRetry().getMaxInterval());
+        backoff.setMaxElapsedTime(properties.getRetry().getMaxAttempts() * properties.getRetry().getMaxInterval()); // Control max attempts via time
 
         return RetryPolicy.builder()
-                .maxRetries(properties.getRetry().getMaxAttempts())
                 .includes(RetryableException.class)
                 .excludes(NonRetryableException.class, IllegalArgumentException.class)
                 // TODO (itaseski): Should set delay?

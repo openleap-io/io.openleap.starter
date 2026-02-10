@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * Sets PostgreSQL session variable app.tenant_id for the current transaction when a tenant is present.
  * Uses "set local" so the value is scoped to the current transaction only.
- *
+ * <p>
  * Guarded at runtime: on non-PostgreSQL databases (e.g., H2) the statement will fail and is ignored.
  */
 @Aspect
