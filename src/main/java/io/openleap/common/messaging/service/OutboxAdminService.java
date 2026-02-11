@@ -22,8 +22,8 @@
  */
 package io.openleap.common.messaging.service;
 
-import io.openleap.common.messaging.repository.OutboxRepository;
 import io.openleap.common.messaging.entity.OutboxEvent;
+import io.openleap.common.messaging.repository.OutboxRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,8 @@ public class OutboxAdminService {
 
     private final OutboxRepository outboxRepository;
 
-    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.maxAttempts:10}")
+    // TODO (itaseski): Remove @Value where possible and rely on *Properties classes instead.
+    @Value("${ol.messaging.outbox.dispatcher.max-attempts:10}")
     private int maxAttempts;
 
     public OutboxAdminService(OutboxRepository outboxRepository) {

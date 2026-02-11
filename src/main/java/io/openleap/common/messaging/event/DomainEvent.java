@@ -23,18 +23,13 @@
 package io.openleap.common.messaging.event;
 
 import java.time.Instant;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * Interface for all domain events in the OpenLeap ecosystem.
  * Follows the Thin Event (Notification) pattern.
  */
 public interface DomainEvent {
-
-    /**
-     * @return Unique identifier for this event instance.
-     */
-    UUID getEventId();
 
     /**
      * @return The business identifier of the aggregate that was changed.
@@ -49,7 +44,7 @@ public interface DomainEvent {
     /**
      * @return The type of the event (e.g., "OrderCreated", "PaymentReceived").
      */
-    String getEventType();
+    String getChangeType();
 
     /**
      * @return The timestamp when the state change occurred.
@@ -60,4 +55,10 @@ public interface DomainEvent {
      * @return The version of the aggregate after the change.
      */
     Long getVersion();
+
+    /**
+     * @return Optional metadata for the event.
+     */
+    Map<String, Object> getMetadata();
+
 }

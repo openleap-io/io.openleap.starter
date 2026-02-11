@@ -1,26 +1,36 @@
 ol:
-  service:
-    messaging:
-      events-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.events}
-      commands-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.commands}
-      coverage: ${OL_MESSAGE_COVERAGE:false}
-      registry:
-        enabled: ${OL_SCHEMA_REGISTRY_ENABLED:false}
-        url: ${OL_SCHEMA_REGISTRY_URL:http://localhost:8990}
-        format: ${OL_SCHEMA_FORMAT:avro}
-      outbox:
-        dispatcher:
-          fixedDelay: 1000
-          enabled: true
-          wakeupAfterCommit: true
-        maxAttempts: 10
-        confirmTimeoutMillis: 5000
-      metrics:
-        queues:
-          main: ${ACC_METRICS_MAIN_QUEUE:}
-          dlq: ${ACC_METRICS_DLQ_QUEUE:}
-      retry:
-        max-attempts: 3
-        initial-interval: 1000
-        multiplier: 2.0
-        max-interval: 10000
+  messaging:
+    enabled: ${OL_MESSAGING_ENABLED:true}
+    events-exchange: ${OL_EVENTS_EXCHANGE:ol.exchange.events}
+    coverage: ${OL_MESSAGE_COVERAGE:false}
+    # TODO (itaseski): Registry and avro is currently outdated and disabled
+    registry:
+      enabled: ${OL_SCHEMA_REGISTRY_ENABLED:false}
+      url: ${OL_SCHEMA_REGISTRY_URL:http://localhost:8990}
+      format: ${OL_SCHEMA_FORMAT:avro}
+    outbox:
+      dispatcher:
+        enabled: ${OL_OUTBOX_DISPATCHER_ENABLED:true}
+        fixed-delay: 1000
+        wakeup-after-commit: true
+        delete-on-ack: false
+        max-attempts: 10
+        confirm-timeout-millis: 5000
+        type: rabbitmq
+    metrics:
+      queues:
+        main: ${ACC_METRICS_MAIN_QUEUE:}
+        dlq: ${ACC_METRICS_DLQ_QUEUE:}
+    retry:
+      max-attempts: 3
+      initial-interval: 1000
+      multiplier: 2.0
+      max-interval: 10000
+  tracing:
+    otel:
+      enabled: ${OL_OTEL_ENABLED:false}
+      endpoint: ${OL_OTEL_ENDPOINT:http://localhost:4317}
+  security:
+    mode: ${OL_SECURITY_MODE:nosec}
+
+

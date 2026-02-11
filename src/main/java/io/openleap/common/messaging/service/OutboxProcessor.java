@@ -21,10 +21,10 @@ public class OutboxProcessor {
 
     private final OutboxDispatcher outboxDispatcher;
 
-    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.maxAttempts:10}")
+    @Value("${ol.messaging.outbox.dispatcher.max-attempts:10}")
     private int maxAttempts;
 
-    @Value("${ol.starter.idempotency.message.deleteOnAck:false}")
+    @Value("${ol.messaging.outbox.dispatcher.delete-on-ack:false}")
     private boolean deleteOnAck;
 
     public OutboxProcessor(OutboxRepository outboxRepository, OutboxDispatcher outboxDispatcher) {

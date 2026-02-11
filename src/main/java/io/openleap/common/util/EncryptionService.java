@@ -1,5 +1,5 @@
 /*
-* This file is part of the openleap.io software project.
+ * This file is part of the openleap.io software project.
  *
  *  Copyright (C) 2025 Dr.-Ing. Sören Kemmann
  *
@@ -23,9 +23,6 @@
 
 package io.openleap.common.util;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -37,15 +34,19 @@ import java.util.Base64;
  * Service for encrypting and decrypting sensitive data like Keycloak client secrets.
  * Uses AES-256-GCM.
  */
-@Service
+// TODO (itaseski): Very basic impl. Should be improved for production.
 public class EncryptionService {
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int TAG_LENGTH_BIT = 128;
     private static final int IV_LENGTH_BYTE = 12;
 
-    @Value("${ol.encryption.secret-key:default-encryption-secret-key-32b}")
-    private String secretKey;
+    // TODO (itaseski) secretKey is String and will be kept in memory which is highly vulnerable
+    private final String secretKey;
+
+    public EncryptionService(String secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String encrypt(String plaintext) {
         try {

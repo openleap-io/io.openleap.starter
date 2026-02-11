@@ -28,4 +28,9 @@ public record RoutingKey(
         String jsonSchemaUrl,
         String avroSchemaUrl
 ) {
+
+    public static RoutingKey of(String key, String description) {
+        return new RoutingKey(key, description, null, null);
+    }
+
 }

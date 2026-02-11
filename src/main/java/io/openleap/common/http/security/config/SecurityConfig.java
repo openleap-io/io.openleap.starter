@@ -26,6 +26,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(OpenleapSecurityProperties.class)
-public class OpenleapSecurityConfig {
+@EnableConfigurationProperties(SecurityProperties.class)
+public class SecurityConfig {
 }
