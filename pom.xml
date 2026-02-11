@@ -194,4 +194,10 @@
         </site>
     </distributionManagement>
 
+    <scm>
+        <url>https://github.com/openleap-io/io.openleap.starter</url>
+        <connection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</connection>
+        <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 </project>
