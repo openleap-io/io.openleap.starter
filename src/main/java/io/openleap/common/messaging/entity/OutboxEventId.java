@@ -30,6 +30,7 @@ public record OutboxEventId(
         return new OutboxEventId(UUID.fromString(value));
     }
 
+    // TODO (itaseski): Consider removing the toString()
     @Override
     public String toString() {
         return value.toString();

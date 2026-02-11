@@ -14,37 +14,19 @@ Add the dependency to your `pom.xml`:
 </dependency>
 ```
 
-Enable features using annotations:
-
-```java
-@SpringBootApplication
-@EnableOpenLeapSecurity
-@EnableOpenLeapMessaging
-@EnableOpenLeapErrorHandling
-@EnableOpenLeapAuditingJpa
-@EnableOpenLeapDistributedLocking
-@EnableOpenLeapIdempotency
-@EnableOpenLeapTelemetry
-public class MyServiceApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(MyServiceApplication.class, args);
-    }
-}
-```
-
 ---
 
 ## Features
 
-| Feature | Package | Enable Annotation |
-|---------|---------|-------------------|
-| HTTP & Security | `io.openleap.common.http` | `@EnableOpenLeapSecurity` |
-| Error Handling | `io.openleap.common.http.error` | `@EnableOpenLeapErrorHandling` |
-| Messaging | `io.openleap.common.messaging` | `@EnableOpenLeapMessaging` |
-| Persistence | `io.openleap.common.persistence` | `@EnableOpenLeapAuditingJpa` |
-| Distributed Lock | `io.openleap.common.lock` | `@EnableOpenLeapDistributedLocking` |
-| Idempotency | `io.openleap.common.idempotency` | `@EnableOpenLeapIdempotency` |
-| Telemetry | `io.openleap.common.http.telemetry` | `@EnableOpenLeapTelemetry` |
+| Feature          | Package                             | 
+|------------------|-------------------------------------| 
+| HTTP & Security  | `io.openleap.common.http`           |
+| Error Handling   | `io.openleap.common.http.error`     | 
+| Messaging        | `io.openleap.common.messaging`      | 
+| Persistence      | `io.openleap.common.persistence`    | 
+| Distributed Lock | `io.openleap.common.lock`           | 
+| Idempotency      | `io.openleap.common.idempotency`    | 
+| Telemetry        | `io.openleap.common.http.telemetry` | 
 
 ---
 

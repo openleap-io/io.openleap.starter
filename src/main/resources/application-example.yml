@@ -1,3 +1,12 @@
+# =============================================================================
+# EXAMPLE CONFIGURATION - DO NOT USE DIRECTLY
+# =============================================================================
+# This file shows all available configuration options for the OpenLeap Messaging library.
+# Copy the relevant sections to your service's application.yml and customize as needed.
+#
+# =============================================================================
+
+
 ol:
   messaging:
     enabled: ${OL_MESSAGING_ENABLED:true}

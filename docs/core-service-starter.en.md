@@ -158,13 +158,6 @@ The starter supports two security modes controlled by `ol.security.mode`:
 | `ErrorResponse` | `...http.error` | Standardized error response DTO |
 | `PageableResponseDto` | `...http.api` | Generic paginated response wrapper |
 
-### Enable Annotations
-
-| Annotation | Description |
-|------------|-------------|
-| `@EnableOpenLeapSecurity` | Enables security configuration |
-| `@EnableOpenLeapErrorHandling` | Enables global exception handling |
-
 ### Usage Examples
 
 **Reading identity in a controller:**
@@ -218,12 +211,6 @@ Located in `io.openleap.common.messaging`
 | `EventPublisher` | `...messaging.event` | Transactional event publisher (writes to outbox) |
 | `MessageCoverageTracker` | `...messaging` | Tracks expected vs sent messages |
 | `MessageCoverageReport` | `...messaging` | Coverage report DTO |
-
-### Enable Annotation
-
-```java
-@EnableOpenLeapMessaging
-```
 
 ### Domain Events
 
@@ -377,12 +364,6 @@ Located in `io.openleap.common.persistence`
 | `AuditingProviderConfig` | `...persistence.config` | Provides AuditorAware linked to IdentityHolder |
 | `TenantRlsAspect` | `...persistence.config` | Row-level security aspect |
 
-### Enable Annotation
-
-```java
-@EnableOpenLeapAuditingJpa
-```
-
 ### Entity Hierarchy
 
 ```
@@ -425,12 +406,6 @@ Provides distributed locking using PostgreSQL advisory locks.
 | `LockRepository` | `...lock.db` | Lock repository interface |
 | `PostgresLockRepository` | `...lock.db` | PostgreSQL implementation |
 | `ConcurrentExecutionException` | `...lock.exception` | Thrown on lock failure |
-
-### Enable Annotation
-
-```java
-@EnableOpenLeapDistributedLocking
-```
 
 ### Usage
 
@@ -478,12 +453,6 @@ Prevents duplicate processing of operations using idempotency keys.
 | `IdempotencyRecordService` | Service for checking/registering idempotency keys |
 | `IdempotentReplayException` | Thrown on duplicate operation |
 
-### Enable Annotation
-
-```java
-@EnableOpenLeapIdempotency
-```
-
 ### Usage
 
 ```java
@@ -519,12 +488,6 @@ Located in `io.openleap.common.http.telemetry`
 |-------|-------------|
 | `OtelConfig` | OpenTelemetry configuration |
 | `TraceIdFilter` | Sets/propagates traceId in MDC |
-
-### Enable Annotation
-
-```java
-@EnableOpenLeapTelemetry
-```
 
 ### Configuration
 
@@ -741,13 +704,6 @@ Located in `io.openleap.common.domain`
 3. **Enable features** using annotations:
    ```java
    @SpringBootApplication
-   @EnableOpenLeapSecurity
-   @EnableOpenLeapMessaging
-   @EnableOpenLeapErrorHandling
-   @EnableOpenLeapAuditingJpa
-   @EnableOpenLeapDistributedLocking
-   @EnableOpenLeapIdempotency
-   @EnableOpenLeapTelemetry
    public class MyServiceApplication {
        public static void main(String[] args) {
            SpringApplication.run(MyServiceApplication.class, args);

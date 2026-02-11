@@ -1,7 +1,7 @@
 CREATE SEQUENCE idempotency_seq START WITH 1 INCREMENT BY 50;
 
 CREATE TABLE idempotency (
-    id BIGSERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
 
     idem_key VARCHAR(128) NOT NULL,
     payload_hash VARCHAR(128) NOT NULL,
