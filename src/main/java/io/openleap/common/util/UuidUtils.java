@@ -7,9 +7,9 @@ import java.util.UUID;
 /**
  * Utility class for UUID handling with compact base64 representation.
  */
-public class OpenleapUuid {
+public class UuidUtils {
 
-    private OpenleapUuid() {
+    private UuidUtils() {
         // Private constructor to prevent instantiation
     }
 

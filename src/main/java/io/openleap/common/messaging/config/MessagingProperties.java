@@ -25,10 +25,10 @@ package io.openleap.common.messaging.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "ol.messaging")
-public class OpenleapMessagingProperties {
+public class MessagingProperties {
 
-    private String eventsExchange = "ol.exchange.events";
-    private String commandsExchange = "ol.exchange.commands";
+    private boolean enabled;
+    private String eventsExchange;
     private boolean coverage = false;
     private Registry registry = new Registry();
     private Outbox outbox = new Outbox();
@@ -37,20 +37,21 @@ public class OpenleapMessagingProperties {
 
     // Getters and Setters
 
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public String getEventsExchange() {
         return eventsExchange;
     }
 
     public void setEventsExchange(String eventsExchange) {
         this.eventsExchange = eventsExchange;
-    }
-
-    public String getCommandsExchange() {
-        return commandsExchange;
-    }
-
-    public void setCommandsExchange(String commandsExchange) {
-        this.commandsExchange = commandsExchange;
     }
 
     public boolean isCoverage() {
@@ -137,7 +138,7 @@ public class OpenleapMessagingProperties {
     public static class Registry {
         private boolean enabled = false;
         private String url = "http://localhost:8990";
-        private String format = "avro";
+        private String format = "application/*+avro";
 
         public boolean isEnabled() {
             return enabled;
@@ -166,8 +167,6 @@ public class OpenleapMessagingProperties {
 
     public static class Outbox {
         private Dispatcher dispatcher = new Dispatcher();
-        private int maxAttempts = 10;
-        private long confirmTimeoutMillis = 5000L;
 
         public Dispatcher getDispatcher() {
             return dispatcher;
@@ -177,26 +176,14 @@ public class OpenleapMessagingProperties {
             this.dispatcher = dispatcher;
         }
 
-        public int getMaxAttempts() {
-            return maxAttempts;
-        }
-
-        public void setMaxAttempts(int maxAttempts) {
-            this.maxAttempts = maxAttempts;
-        }
-
-        public long getConfirmTimeoutMillis() {
-            return confirmTimeoutMillis;
-        }
-
-        public void setConfirmTimeoutMillis(long confirmTimeoutMillis) {
-            this.confirmTimeoutMillis = confirmTimeoutMillis;
-        }
-
         public static class Dispatcher {
             private long fixedDelay = 1000L;
             private boolean enabled = true;
             private boolean wakeupAfterCommit = true;
+            private boolean deleteOnAck = false;
+            private int maxAttempts = 10;
+            private long confirmTimeoutMillis = 5000L;
+            private String type = "rabbitmq";
 
             public long getFixedDelay() {
                 return fixedDelay;
@@ -220,6 +207,38 @@ public class OpenleapMessagingProperties {
 
             public void setWakeupAfterCommit(boolean wakeupAfterCommit) {
                 this.wakeupAfterCommit = wakeupAfterCommit;
+            }
+
+            public boolean isDeleteOnAck() {
+                return deleteOnAck;
+            }
+
+            public void setDeleteOnAck(boolean deleteOnAck) {
+                this.deleteOnAck = deleteOnAck;
+            }
+
+            public int getMaxAttempts() {
+                return maxAttempts;
+            }
+
+            public void setMaxAttempts(int maxAttempts) {
+                this.maxAttempts = maxAttempts;
+            }
+
+            public long getConfirmTimeoutMillis() {
+                return confirmTimeoutMillis;
+            }
+
+            public void setConfirmTimeoutMillis(long confirmTimeoutMillis) {
+                this.confirmTimeoutMillis = confirmTimeoutMillis;
+            }
+
+            public String getType() {
+                return type;
+            }
+
+            public void setType(String type) {
+                this.type = type;
             }
         }
     }

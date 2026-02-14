@@ -44,10 +44,10 @@ public class OutboxOrchestrator {
 
     private final OutboxProcessor outboxProcessor;
 
-    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.enabled:true}")
+    @Value("${ol.messaging.outbox.dispatcher.enabled:true}")
     private boolean enabled;
 
-    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.fixedDelay:1000}")
+    @Value("${ol.messaging.outbox.dispatcher.fixed-delay:1000}")
     private long fixedDelayMs;
 
     // Serialize dispatcher execution within this JVM to avoid double sending
@@ -66,7 +66,7 @@ public class OutboxOrchestrator {
      * Backup scheduled tick: if fixedDelay is set to 0, the scheduled wakeup is effectively disabled.
      * Otherwise, it only signals the worker to perform a dispatch pass.
      */
-    @Scheduled(fixedDelayString = "${ol.service.messaging.outbox.dispatcher.fixedDelay:1000}")
+    @Scheduled(fixedDelayString = "${ol.messaging.outbox.dispatcher.fixed-delay:1000}")
     public void scheduledTick() {
         if (!enabled) return;
         if (fixedDelayMs == 0) {

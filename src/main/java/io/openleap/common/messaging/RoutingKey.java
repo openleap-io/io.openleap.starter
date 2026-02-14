@@ -22,10 +22,33 @@
  */
 package io.openleap.common.messaging;
 
+import java.util.Objects;
+
 public record RoutingKey(
         String key,
         String description,
         String jsonSchemaUrl,
         String avroSchemaUrl
 ) {
+
+    public RoutingKey {
+        Objects.requireNonNull(key, "Routing key cannot be null");
+    }
+
+    public static RoutingKey of(String key) {
+        return new RoutingKey(key, null, null, null);
+    }
+
+    public static RoutingKey of(String key, String description) {
+        return new RoutingKey(key, description, null, null);
+    }
+
+    public static RoutingKey withJsonSchema(String key, String description, String jsonSchemaUrl) {
+        return new RoutingKey(key, description, jsonSchemaUrl, null);
+    }
+
+    public static RoutingKey withAvroSchema(String key, String description, String avroSchemaUrl) {
+        return new RoutingKey(key, description, null, avroSchemaUrl);
+    }
+
 }

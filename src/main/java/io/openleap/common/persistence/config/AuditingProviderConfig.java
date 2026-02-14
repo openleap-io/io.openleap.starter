@@ -32,6 +32,7 @@ import java.util.UUID;
 
 /**
  * Provides Spring Data JPA AuditorAware backed by IdentityHolder so that
+ *
  * @CreatedBy and @LastModifiedBy fields in entities are populated from the
  * current user identity seeded by tests (@WithTenant) or runtime filters.
  */

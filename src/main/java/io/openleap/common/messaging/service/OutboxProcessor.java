@@ -2,8 +2,8 @@ package io.openleap.common.messaging.service;
 
 import io.openleap.common.messaging.dispatcher.DispatchResult;
 import io.openleap.common.messaging.dispatcher.OutboxDispatcher;
-import io.openleap.common.persistence.repository.OutboxRepository;
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.repository.OutboxRepository;
+import io.openleap.common.messaging.entity.OutboxEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,10 @@ public class OutboxProcessor {
 
     private final OutboxDispatcher outboxDispatcher;
 
-    @Value("${ol.starter.idempotency.messaging.outbox.dispatcher.maxAttempts:10}")
+    @Value("${ol.messaging.outbox.dispatcher.max-attempts:10}")
     private int maxAttempts;
 
-    @Value("${ol.starter.idempotency.message.deleteOnAck:false}")
+    @Value("${ol.messaging.outbox.dispatcher.delete-on-ack:false}")
     private boolean deleteOnAck;
 
     public OutboxProcessor(OutboxRepository outboxRepository, OutboxDispatcher outboxDispatcher) {

@@ -20,9 +20,9 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.common.persistence.repository;
+package io.openleap.common.messaging.repository;
 
-import io.openleap.common.persistence.entity.OutboxEvent;
+import io.openleap.common.messaging.entity.OutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

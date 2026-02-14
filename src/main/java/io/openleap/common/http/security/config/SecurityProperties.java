@@ -25,7 +25,7 @@ package io.openleap.common.http.security.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "ol.security")
-public class OpenleapSecurityProperties {
+public class SecurityProperties {
 
     /**
      * Security mode selector. Valid values:

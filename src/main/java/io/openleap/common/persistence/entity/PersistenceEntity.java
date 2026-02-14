@@ -24,10 +24,16 @@
 package io.openleap.common.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
 @MappedSuperclass
+@Getter
+@Setter
+@EqualsAndHashCode
 public abstract class PersistenceEntity implements Serializable {
 
     @Id
@@ -38,27 +44,5 @@ public abstract class PersistenceEntity implements Serializable {
             strategy = GenerationType.SEQUENCE
     )
     private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PersistenceEntity that = (PersistenceEntity) o;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        // Use class hashCode for consistent behavior across entity states
-        return getClass().hashCode();
-    }
 
 }

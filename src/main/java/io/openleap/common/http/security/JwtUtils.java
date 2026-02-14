@@ -22,8 +22,8 @@
  */
 package io.openleap.common.http.security;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -35,9 +35,10 @@ import java.util.Map;
  * Intended for extracting identity information in "simplesec" mode.
  */
 public final class JwtUtils {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
-    private JwtUtils() {}
+    private JwtUtils() {
+    }
 
     public static Map<String, Object> decodePayloadClaims(String jwt) {
         if (jwt == null) return Collections.emptyMap();
@@ -48,7 +49,8 @@ public final class JwtUtils {
             if (parts.length < 2) return Collections.emptyMap();
             byte[] decoded = Base64.getUrlDecoder().decode(parts[1]);
             String json = new String(decoded, StandardCharsets.UTF_8);
-            return OBJECT_MAPPER.readValue(json, new TypeReference<Map<String, Object>>(){});
+            return JSON_MAPPER.readValue(json, new TypeReference<>() {
+            });
         } catch (Exception e) {
             return Collections.emptyMap();
         }

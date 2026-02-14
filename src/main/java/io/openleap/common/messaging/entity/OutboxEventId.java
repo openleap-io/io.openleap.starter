@@ -1,4 +1,4 @@
-package io.openleap.common.persistence.entity;
+package io.openleap.common.messaging.entity;
 
 import io.openleap.common.domain.BusinessId;
 import jakarta.persistence.Column;
@@ -30,6 +30,7 @@ public record OutboxEventId(
         return new OutboxEventId(UUID.fromString(value));
     }
 
+    // TODO (itaseski): Consider removing the toString()
     @Override
     public String toString() {
         return value.toString();

@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Command-level idempotency idempotency backed by the shared idempotency table.
+ * Command-level idempotency backed by the shared idempotency table.
  * Stores a unique key per processed command and allows duplicate detection.
  */
 @Service

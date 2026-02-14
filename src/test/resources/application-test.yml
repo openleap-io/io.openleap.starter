@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:18:///openleap
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true  # optional, for debugging
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+ol:
+  messaging:
+    enabled: true
+    events-exchange: ol.exchange.events
+    coverage: false
+    registry:
+      enabled: false
+      url: http://localhost:8990
+      format: avro
+    outbox:
+      dispatcher:
+        enabled: true
+        fixed-delay: 1000
+        wakeup-after-commit: true
+        delete-on-ack: false
+        max-attempts: 10
+        confirm-timeout-millis: 5000
+        type: rabbitmq
+    metrics:
+      queues:
+        main: metrics.main
+        dlq: metrics.dlq
+    retry:
+      max-attempts: 3
+      initial-interval: 1000
+      multiplier: 2.0
+      max-interval: 10000
+  tracing:
+    otel:
+      enabled: false
+      endpoint: http://localhost:4317
+  security:
+    mode: nosec
