@@ -27,23 +27,51 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "ol.security")
 public class SecurityProperties {
 
-    /**
-     * Security mode selector. Valid values:
-     * - nosec: headers carry plain identity info (X-Tenant-Id, X-User-Id, X-Scopes, X-Roles)
-     * - iamsec: JWT is provided (HTTP: Authorization Bearer or X-JWT; Messaging: x-jwt header)
-     */
-    private Mode mode = Mode.nosec;
+    private Rest rest = new Rest();
+    private Messaging messaging = new Messaging();
 
-    public Mode getMode() {
-        return mode;
+    public Rest getRest() {
+        return rest;
     }
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
+    public void setRest(Rest rest) {
+        this.rest = rest;
+    }
+
+    public Messaging getMessaging() {
+        return messaging;
+    }
+
+    public void setMessaging(Messaging messaging) {
+        this.messaging = messaging;
     }
 
     public enum Mode {
         nosec,
         iamsec
+    }
+
+    public static class Rest {
+        private Mode mode = Mode.nosec;
+
+        public Mode getMode() {
+            return mode;
+        }
+
+        public void setMode(Mode mode) {
+            this.mode = mode;
+        }
+    }
+
+    public static class Messaging {
+        private Mode mode = Mode.nosec;
+
+        public Mode getMode() {
+            return mode;
+        }
+
+        public void setMode(Mode mode) {
+            this.mode = mode;
+        }
     }
 }
