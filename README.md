@@ -10,7 +10,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
     <groupId>io.openleap.common</groupId>
     <artifactId>core-service</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
 </dependency>
 ```
 
