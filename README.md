@@ -189,8 +189,8 @@ Flyway scripts are provided in `src/main/resources/db/migration/`:
 
 | Script | Description |
 |--------|-------------|
-| `V1__create_outbox_table.sql` | Outbox event table |
-| `V2__create_idempotency_table.sql` | Idempotency record table |
+| `V0.1__create_outbox_table.sql` | Outbox event table |
+| `V0.2__create_idempotency_table.sql` | Idempotency record table |
 
 ---
 

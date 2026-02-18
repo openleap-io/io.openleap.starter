@@ -729,8 +729,8 @@ The starter provides Flyway migration scripts in `src/main/resources/db/migratio
 
 | Script | Description |
 |--------|-------------|
-| `V1__create_outbox_table.sql` | Creates `outbox_event` table |
-| `V2__create_idempotency_table.sql` | Creates `idempotency_record` table |
+| `V0.1__create_outbox_table.sql` | Creates `outbox_event` table |
+| `V0.2__create_idempotency_table.sql` | Creates `idempotency_record` table |
 
 ---
 
