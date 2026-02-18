@@ -57,6 +57,7 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
     public static final String HDR_SCOPES = "X-Scopes";
     public static final String HDR_ROLES = "X-Roles";
     public static final String HDR_JWT = "X-JWT";
+    public static final String HDR_REQUEST_ID = "X-Request-Id";
     public static final String TENANT_ID = "tenantId";
     public static final String USER_ID = "userId";
 
@@ -79,6 +80,7 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
             // Bridge to MDC for logging
             putMdc(TENANT_ID, uuidToStringSafe(IdentityHolder.getTenantId()));
             putMdc(USER_ID, uuidToStringSafe(IdentityHolder.getUserId()));
+            putMdc(HDR_REQUEST_ID, firstNonBlank(request.getHeader(HDR_REQUEST_ID), UUID.randomUUID().toString()));
             filterChain.doFilter(request, response);
         } finally {
             // Clear both MDC and IdentityHolder to avoid leakage across threads
