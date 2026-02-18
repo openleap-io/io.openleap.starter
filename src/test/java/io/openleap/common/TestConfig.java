@@ -10,11 +10,13 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Configuration
 @EnableAutoConfiguration
+@EnableAspectJAutoProxy
 @ComponentScan(basePackages = "io.openleap.common")
 @EnableJpaRepositories(basePackages = "io.openleap.common")
 @EntityScan(basePackages = "io.openleap.common")
