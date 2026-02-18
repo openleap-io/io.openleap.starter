@@ -21,15 +21,18 @@
  *  You may choose which license to apply.
  */
 
-package io.openleap.common.persistence.entity;
+package io.openleap.common.messaging.entity;
 
 import io.openleap.common.domain.DomainEntity;
+import io.openleap.common.persistence.entity.AuditableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 
@@ -47,7 +50,7 @@ public class OutboxEvent extends AuditableEntity implements DomainEntity<OutboxE
     @Embedded
     private OutboxEventId businessId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 256)
     private String exchangeKey;
 
     @Column(nullable = false, length = 256)
@@ -68,9 +71,11 @@ public class OutboxEvent extends AuditableEntity implements DomainEntity<OutboxE
     @Column(length = 4000)
     private String lastError;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false, columnDefinition = "jsonb")
     private String payloadJson;
 
-    @Column(columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
     private String headersJson;
 }

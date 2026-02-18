@@ -20,15 +20,16 @@
  *
  *  You may choose which license to apply.
  */
+
 package io.openleap.common.messaging.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openleap.common.ReflectionUtils;
+import io.openleap.common.messaging.MessageCoverageTracker;
 import io.openleap.common.messaging.RoutingKey;
-import io.openleap.common.messaging.config.OpenleapMessagingProperties;
+import io.openleap.common.messaging.config.MessagingProperties;
+import io.openleap.common.messaging.entity.OutboxEvent;
+import io.openleap.common.messaging.repository.OutboxRepository;
 import io.openleap.common.messaging.service.OutboxOrchestrator;
-import io.openleap.common.persistence.entity.OutboxEvent;
-import io.openleap.common.persistence.repository.OutboxRepository;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -51,19 +54,22 @@ class EventPublisherTest {
     private OutboxRepository outboxRepository;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     @Mock
     private OutboxOrchestrator outboxOrchestrator;
 
     @Mock
-    private OpenleapMessagingProperties config;
+    private MessagingProperties config;
+
+    @Mock
+    private MessageCoverageTracker messageCoverageTracker;
 
     private EventPublisher eventPublisher;
 
     @BeforeEach
     void setup() {
-        eventPublisher = new EventPublisher(config, outboxRepository, objectMapper, outboxOrchestrator);
+        eventPublisher = new EventPublisher(config, outboxRepository, jsonMapper, outboxOrchestrator, Optional.of(messageCoverageTracker));
 
         ReflectionUtils.setField(eventPublisher, "eventsExchange", "test-exchange");
         ReflectionUtils.setField(eventPublisher, "wakeupAfterCommit", false); // Ignore the synchronization logic
@@ -74,13 +80,13 @@ class EventPublisherTest {
     void enqueue_Success_WhenPayloadIsValid() throws Exception {
         // given
         RoutingKey routingKey = new RoutingKey("order.created", "Order Created Event", null, null);
-        EventPayload payload = new EventPayload();
+        BaseDomainEvent payload = BaseDomainEvent.builder().build();
         Map<String, String> headers = new HashMap<>(Map.of("custom-header", "test"));
         String jsonHeaders = "{\"custom-header\":\"test\"}";
         String jsonPayload = "{\"type\":\"test\"}";
 
-        when(objectMapper.writeValueAsString(any(EventPayload.class))).thenReturn(jsonPayload);
-        when(objectMapper.writeValueAsString(any(Map.class))).thenReturn(jsonHeaders);
+        when(jsonMapper.writeValueAsString(any(BaseDomainEvent.class))).thenReturn(jsonPayload);
+        when(jsonMapper.writeValueAsString(any(Map.class))).thenReturn(jsonHeaders);
 
         // when
         eventPublisher.enqueue(routingKey, payload, headers);

@@ -1,6 +1,6 @@
 package io.openleap.common.messaging.command;
 
-import io.openleap.common.util.OpenleapUuid;
+import io.openleap.common.util.UuidUtils;
 
 import java.util.UUID;
 
@@ -14,9 +14,9 @@ public record CommandId(UUID value) {
     }
 
     public static CommandId create() {
-        return new CommandId(OpenleapUuid.create());
+        return new CommandId(UuidUtils.create());
     }
     public static CommandId generate() {
-        return new CommandId(OpenleapUuid.create());
+        return new CommandId(UuidUtils.create());
     }
 }

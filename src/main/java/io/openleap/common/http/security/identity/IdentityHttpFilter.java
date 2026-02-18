@@ -23,15 +23,12 @@
 package io.openleap.common.http.security.identity;
 
 import io.openleap.common.http.security.JwtUtils;
-import io.openleap.common.http.security.config.OpenleapSecurityProperties;
+import io.openleap.common.http.security.config.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -55,43 +52,48 @@ import java.util.*;
 @Order(Ordered.HIGHEST_PRECEDENCE + 10) // after TraceIdFilter
 public class IdentityHttpFilter extends OncePerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(IdentityHttpFilter.class);
-
     public static final String HDR_TENANT = "X-Tenant-Id";
     public static final String HDR_USER = "X-User-Id";
     public static final String HDR_SCOPES = "X-Scopes";
     public static final String HDR_ROLES = "X-Roles";
     public static final String HDR_JWT = "X-JWT";
+    public static final String HDR_REQUEST_ID = "X-Request-Id";
+    public static final String TENANT_ID = "tenantId";
+    public static final String USER_ID = "userId";
 
-    @Autowired(required = false)
-    private OpenleapSecurityProperties olStarterServiceProperties;
+    private final SecurityProperties olStarterServiceProperties;
+
+    public IdentityHttpFilter(Optional<SecurityProperties> olStarterServiceProperties) {
+        this.olStarterServiceProperties = olStarterServiceProperties.orElse(null);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        OpenleapSecurityProperties.Mode mode = resolveMode();
+        SecurityProperties.Mode mode = resolveMode();
         try {
-            if (mode == OpenleapSecurityProperties.Mode.iamsec) {
+            if (mode == SecurityProperties.Mode.iamsec) {
                 applyFromJwt(request);
             } else {
                 applyFromHeaders(request);
             }
             // Bridge to MDC for logging
-            putMdc("tenantId", uuidToStringSafe(IdentityHolder.getTenantId()));
-            putMdc("userId", uuidToStringSafe(IdentityHolder.getUserId()));
+            putMdc(TENANT_ID, uuidToStringSafe(IdentityHolder.getTenantId()));
+            putMdc(USER_ID, uuidToStringSafe(IdentityHolder.getUserId()));
+            putMdc(HDR_REQUEST_ID, firstNonBlank(request.getHeader(HDR_REQUEST_ID), UUID.randomUUID().toString()));
             filterChain.doFilter(request, response);
         } finally {
             // Clear both MDC and IdentityHolder to avoid leakage across threads
-            MDC.remove("tenantId");
-            MDC.remove("userId");
+            MDC.remove(TENANT_ID);
+            MDC.remove(USER_ID);
             IdentityHolder.clear();
         }
     }
 
     private void applyFromHeaders(HttpServletRequest request) {
         // Values may be absent; we do not enforce validation at HTTP layer
-        String tenantId = firstNonBlank(request.getHeader(HDR_TENANT), request.getHeader("tenantId"));
-        String userId = firstNonBlank(request.getHeader(HDR_USER), request.getHeader("userId"));
+        String tenantId = firstNonBlank(request.getHeader(HDR_TENANT), request.getHeader(TENANT_ID));
+        String userId = firstNonBlank(request.getHeader(HDR_USER), request.getHeader(USER_ID));
         if (isNotBlank(tenantId)) {
             uuidOrNull(tenantId).ifPresent(IdentityHolder::setTenantId);
         }
@@ -127,8 +129,8 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
             }
         }
         // Extract values
-        Optional<UUID> tenant = findUuidClaim(claims, "tenantId", "tenantid", "tenant_id");
-        Optional<UUID> user = findUuidClaim(claims, "userId", "userid", "user_id", "sub", "subject");
+        Optional<UUID> tenant = findUuidClaim(claims, TENANT_ID, "tenantid", "tenant_id");
+        Optional<UUID> user = findUuidClaim(claims, USER_ID, "userid", "user_id", "sub", "subject");
         tenant.ifPresent(IdentityHolder::setTenantId);
         user.ifPresent(IdentityHolder::setUserId);
 
@@ -202,13 +204,13 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
 
     private static boolean isNotBlank(String s) { return s != null && !s.trim().isEmpty(); }
 
-    private OpenleapSecurityProperties.Mode resolveMode() {
+    private SecurityProperties.Mode resolveMode() {
         try {
-            if (olStarterServiceProperties != null && olStarterServiceProperties.getMode() != null) {
-                return olStarterServiceProperties.getMode();
+            if (olStarterServiceProperties != null && olStarterServiceProperties.getHttp().getMode() != null) {
+                return olStarterServiceProperties.getHttp().getMode();
             }
         } catch (Exception ignored) { }
-        return OpenleapSecurityProperties.Mode.nosec;
+        return SecurityProperties.Mode.nosec;
     }
 
     private static String firstNonBlank(String... values) {

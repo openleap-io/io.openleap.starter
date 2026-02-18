@@ -20,20 +20,12 @@
  *
  *  You may choose which license to apply.
  */
-package io.openleap.common.util;
+package io.openleap.common.http.security.config;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.zalando.jackson.datatype.money.MoneyModule;
 
 @Configuration
-public class JacksonConfig {
-
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer moneyModuleCustomizer() {
-        // Install MoneyModule in addition to Spring Boot's default modules (e.g., JavaTimeModule)
-        return builder -> builder.modulesToInstall(MoneyModule.class, JavaTimeModule.class);
-    }
+@EnableConfigurationProperties(SecurityProperties.class)
+public class SecurityConfig {
 }

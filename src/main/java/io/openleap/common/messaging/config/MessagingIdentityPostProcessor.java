@@ -23,15 +23,12 @@
 package io.openleap.common.messaging.config;
 
 import io.openleap.common.http.security.JwtUtils;
-import io.openleap.common.http.security.config.OpenleapSecurityProperties;
+import io.openleap.common.http.security.config.SecurityProperties;
 import io.openleap.common.http.security.identity.IdentityHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -39,22 +36,23 @@ import java.util.*;
 @Component
 public class MessagingIdentityPostProcessor implements MessagePostProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(MessagingIdentityPostProcessor.class);
-
     public static final String HDR_TENANT = "x-tenant-id";
     public static final String HDR_USER = "x-user-id";
     public static final String HDR_SCOPES = "x-scopes";
     public static final String HDR_ROLES = "x-roles";
     public static final String HDR_JWT = "x-jwt";
 
-    @Autowired(required = false)
-    private OpenleapSecurityProperties olStarterServiceProperties;
+    private final SecurityProperties olStarterServiceProperties;
+
+    public MessagingIdentityPostProcessor(Optional<SecurityProperties> olStarterServiceProperties) {
+        this.olStarterServiceProperties = olStarterServiceProperties.orElse(null);
+    }
 
     @Override
     public Message postProcessMessage(Message message) throws AmqpRejectAndDontRequeueException {
-        OpenleapSecurityProperties.Mode mode = resolveMode();
+        SecurityProperties.Mode mode = resolveMode();
         try {
-            if (mode == OpenleapSecurityProperties.Mode.iamsec) {
+            if (mode == SecurityProperties.Mode.iamsec) {
                 applyFromJwt(message.getMessageProperties());
             } else {
                 applyFromHeaders(message.getMessageProperties());
@@ -64,18 +62,14 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
                 throw new AmqpRejectAndDontRequeueException("Missing tenantId or userId in message headers");
             }
             return message;
-        } catch (AmqpRejectAndDontRequeueException e) {
-            // Ensure clear before throwing
-            IdentityHolder.clear();
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             IdentityHolder.clear();
             throw e;
         }
     }
 
     private void applyFromHeaders(MessageProperties props) {
-        Map<String, Object> headers = safeHeaders(props);
+        Map<String, Object> headers = props.getHeaders();
         Optional<UUID> tenant = firstUuid(headers, HDR_TENANT, "X-Tenant-Id");
         Optional<UUID> user = firstUuid(headers, HDR_USER, "X-User-Id");
         tenant.ifPresent(IdentityHolder::setTenantId);
@@ -85,7 +79,7 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
     }
 
     private void applyFromJwt(MessageProperties props) {
-        Map<String, Object> headers = safeHeaders(props);
+        Map<String, Object> headers = props.getHeaders();
         String jwt = stringHeader(headers.get(HDR_JWT), headers.get("X-JWT"));
         Map<String, Object> claims = JwtUtils.decodePayloadClaims(jwt);
         // tenant/user
@@ -94,11 +88,6 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
         // roles/scopes
         IdentityHolder.setRoles(claimAsStringSet(claims, "roles"));
         IdentityHolder.setScopes(scopesFromClaim(claims));
-    }
-
-    private static Map<String, Object> safeHeaders(MessageProperties props) {
-        Map<String, Object> h = props.getHeaders();
-        return h != null ? h : Collections.emptyMap();
     }
 
     private static String stringHeader(Object... candidates) {
@@ -176,12 +165,12 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
         return out;
     }
 
-    private OpenleapSecurityProperties.Mode resolveMode() {
+    private SecurityProperties.Mode resolveMode() {
         try {
-            if (olStarterServiceProperties != null && olStarterServiceProperties.getMode() != null) {
-                return olStarterServiceProperties.getMode();
+            if (olStarterServiceProperties != null && olStarterServiceProperties.getMessaging().getMode() != null) {
+                return olStarterServiceProperties.getMessaging().getMode();
             }
         } catch (Exception ignored) { }
-        return OpenleapSecurityProperties.Mode.nosec;
+        return SecurityProperties.Mode.nosec;
     }
 }

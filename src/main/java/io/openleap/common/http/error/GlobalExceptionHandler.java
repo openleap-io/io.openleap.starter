@@ -25,6 +25,8 @@ package io.openleap.common.http.error;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -43,9 +45,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Global fallback exception handler with lowest precedence.
+ * <p>
+ * Exception handlers in specific services should have higher precedence
+ * than this global handler to allow domain-specific error handling.
+ * This handler acts as a last resort catch-all.
+ */
 // TODO (itaseski): Consider moving to API package
 @Slf4j
 @RestControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
     private static final String TRACE_ID = "traceId";
