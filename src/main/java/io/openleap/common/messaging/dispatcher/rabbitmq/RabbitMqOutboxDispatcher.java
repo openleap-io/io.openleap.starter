@@ -31,7 +31,7 @@ public class RabbitMqOutboxDispatcher implements OutboxDispatcher {
     @Override
     public DispatchResult dispatch(OutboxEvent event) throws Exception {
         Assert.notNull(event.getId(), "OutboxEvent ID must not be null");
-        String payload = event.getPayloadJson();
+        Object payload = jsonMapper.readValue(event.getPayloadJson(), Object.class);
         Map<String, Object> headers = parseHeaders(event.getHeadersJson());
         CorrelationData cd = new CorrelationData(event.getId().toString());
 

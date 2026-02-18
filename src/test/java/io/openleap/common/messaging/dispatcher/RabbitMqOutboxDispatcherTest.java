@@ -14,6 +14,8 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doAnswer;
@@ -51,7 +53,7 @@ class RabbitMqOutboxDispatcherTest {
         verify(rabbitTemplate).convertAndSend(
                 eq("test-exchange"),
                 eq("test-rk"),
-                eq("{\"data\":\"test\"}"),
+                eq(Map.of("data", "test")),
                 any(MessagePostProcessor.class),
                 any(CorrelationData.class)
         );

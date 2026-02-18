@@ -167,8 +167,8 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
 
     private SecurityProperties.Mode resolveMode() {
         try {
-            if (olStarterServiceProperties != null && olStarterServiceProperties.getMode() != null) {
-                return olStarterServiceProperties.getMode();
+            if (olStarterServiceProperties != null && olStarterServiceProperties.getMessaging().getMode() != null) {
+                return olStarterServiceProperties.getMessaging().getMode();
             }
         } catch (Exception ignored) { }
         return SecurityProperties.Mode.nosec;
