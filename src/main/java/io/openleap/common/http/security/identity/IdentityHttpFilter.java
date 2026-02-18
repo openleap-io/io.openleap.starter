@@ -204,8 +204,8 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
 
     private SecurityProperties.Mode resolveMode() {
         try {
-            if (olStarterServiceProperties != null && olStarterServiceProperties.getRest().getMode() != null) {
-                return olStarterServiceProperties.getRest().getMode();
+            if (olStarterServiceProperties != null && olStarterServiceProperties.getHttp().getMode() != null) {
+                return olStarterServiceProperties.getHttp().getMode();
             }
         } catch (Exception ignored) { }
         return SecurityProperties.Mode.nosec;

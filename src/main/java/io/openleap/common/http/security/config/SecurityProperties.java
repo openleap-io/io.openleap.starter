@@ -27,15 +27,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "ol.security")
 public class SecurityProperties {
 
-    private Rest rest = new Rest();
+    private Http http = new Http();
     private Messaging messaging = new Messaging();
 
-    public Rest getRest() {
-        return rest;
+    public Http getHttp() {
+        return http;
     }
 
-    public void setRest(Rest rest) {
-        this.rest = rest;
+    public void setHttp(Http http) {
+        this.http = http;
     }
 
     public Messaging getMessaging() {
@@ -51,7 +51,7 @@ public class SecurityProperties {
         iamsec
     }
 
-    public static class Rest {
+    public static class Http {
         private Mode mode = Mode.nosec;
 
         public Mode getMode() {
