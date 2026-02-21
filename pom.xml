@@ -265,5 +265,18 @@
         <developerConnection>scm:git:https://${scmuser}github.com/openleap-io/io.openleap.starter.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <repositories>
+        <repository>
+            <id>github-openleap-parent</id>
+            <name>GitHub Packages - openleap parent</name>
+            <url>https://maven.pkg.github.com/openleap-io/io.openleap.parent</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 </project>
 
