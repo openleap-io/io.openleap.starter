@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
-      packages: read
+      packages: write
       checks: write
 
     steps:
@@ -51,7 +51,7 @@ jobs:
           EOF
 
       - name: Build
-        run: ./mvnw -U -B clean verify
+        run: mvn -U -B clean verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
