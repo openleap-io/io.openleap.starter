@@ -2,21 +2,23 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - github-workflow
-    tags:
-      - 'v*'
-  workflow_dispatch:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-      packages: write
-    
+      packages: read
+      checks: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,17 +50,28 @@ jobs:
           </settings>
           EOF
 
-      - name: Build project
-        run: mvn clean install -DskipTests
+      - name: Build
+        run: ./mvnw -U -B clean verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
-      - name: Run tests
-        run: mvn test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: JUnit Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+
+      - name: Scan for vulnerabilities
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: '0'
 
       - name: Deploy to GitHub Packages
         run: mvn -B -DskipTests deploy
