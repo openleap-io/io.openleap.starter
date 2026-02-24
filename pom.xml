@@ -14,7 +14,7 @@
 
     <groupId>io.openleap.common</groupId>
     <artifactId>core-service</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
     <name>Common Service</name>
     <description>OpenLeap.io common service starter for platform alignment</description>
     <url>https://github.com/openleap-io/io.openleap.starter</url>
@@ -226,22 +226,6 @@
         <!--TODO (itaseski): Add avro schema dependency -->
 
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
     <distributionManagement>
         <repository>
