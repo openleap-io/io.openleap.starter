@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -59,6 +60,18 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final String TRACE_ID = "traceId";
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Object> handleAuthorizationDeniedException(AuthorizationDeniedException ex){
+        log.warn("Authorization denied: {}", ex.getMessage());
+        var body = new ErrorResponse(
+                ErrorCode.FORBIDDEN.name(),
+                ErrorCode.FORBIDDEN.message(),
+                "Authorization denied",
+                MDC.get(TRACE_ID)
+        );
+        return new ResponseEntity<>(body, new HttpHeaders(), ErrorCode.FORBIDDEN.status());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
