@@ -6,9 +6,9 @@ on:
       java-version:
         type: string
         default: '25'
-      secrets:
-        GH_PACKAGES_TOKEN:
-          required: false
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: false
   push:
     branches: [ main ]
   pull_request:
