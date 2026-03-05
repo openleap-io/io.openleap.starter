@@ -67,6 +67,17 @@ jobs:
           path: target/surefire-reports/*.xml
           reporter: java-junit
 
+      - name: Debug find jacoco.xml
+        run: |
+            find . -name jacoco.xml -print
+
+      - name: JaCoCo Report
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: |
+            **/target/site/jacoco-merged-test-coverage-report/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Scan for vulnerabilities
         uses: aquasecurity/trivy-action@0.29.0
         with:
