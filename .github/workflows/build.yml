@@ -1,6 +1,14 @@
 name: Build and Deploy
 
 on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: string
+        default: '25'
+      secrets:
+        GH_PACKAGES_TOKEN:
+          required: false
   push:
     branches: [ main ]
   pull_request:
@@ -22,14 +30,15 @@ jobs:
       issues: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
         with:
-          java-version: '25'
-          distribution: 'temurin'
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
           cache: maven
 
       - name: Configure Maven settings
@@ -66,6 +75,15 @@ jobs:
           name: JUnit Tests
           path: target/surefire-reports/*.xml
           reporter: java-junit
+      - name: Debug find jacoco.xml
+        run: |
+          find . -name jacoco.xml -print
+      - name: JaCoCo Report
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: |
+              **/target/site/jacoco-merged-test-coverage-report/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Scan for vulnerabilities
         uses: aquasecurity/trivy-action@0.29.0
