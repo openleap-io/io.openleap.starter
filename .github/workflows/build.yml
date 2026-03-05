@@ -79,6 +79,6 @@ jobs:
       - name: Deploy to GitHub Packages
         run: mvn -B -DskipTests deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
