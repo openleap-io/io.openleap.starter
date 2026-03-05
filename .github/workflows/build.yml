@@ -1,7 +1,8 @@
 name: Build and Deploy
 
 on:
-  workflow_call:
+  push:
+    branches: [ main ]
     inputs:
       java-version:
         type: string
@@ -9,10 +10,15 @@ on:
     secrets:
       GH_PACKAGES_TOKEN:
         required: false
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
+    inputs:
+      java-version:
+        type: string
+        default: '25'
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
