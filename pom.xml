@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -14,7 +13,7 @@
 
     <groupId>io.openleap.common</groupId>
     <artifactId>core-service</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.3-SNAPSHOT</version>
     <name>Common Service</name>
     <description>OpenLeap.io common service starter for platform alignment</description>
     <url>https://github.com/openleap-io/io.openleap.starter</url>
