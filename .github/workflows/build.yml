@@ -67,14 +67,14 @@ jobs:
           path: target/surefire-reports/*.xml
           reporter: java-junit
 
-#      - name: Scan for vulnerabilities
-#        uses: aquasecurity/trivy-action@0.29.0
-#        with:
-#          scan-type: fs
-#          scan-ref: .
-#          format: table
-#          severity: HIGH,CRITICAL
-#          exit-code: '0'
+      - name: Scan for vulnerabilities
+        uses: aquasecurity/trivy-action@0.34.2
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: '0'
 
       - name: Deploy to GitHub Packages
         run: mvn -B -DskipTests deploy
