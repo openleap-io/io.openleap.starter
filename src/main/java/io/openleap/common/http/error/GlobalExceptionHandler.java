@@ -32,6 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import io.openleap.common.http.iam.PermissionDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,8 +63,14 @@ public class GlobalExceptionHandler {
 
     private static final String TRACE_ID = "traceId";
 
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<Object> handleAuthorizationDeniedException(AuthorizationDeniedException ex){
+    @ExceptionHandler(PermissionDeniedException.class)
+    public ResponseEntity<Object> handlePermissionDeniedException(PermissionDeniedException ex) {
+        log.warn("Permission denied: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getResponse(), new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<Object> handleAuthorizationDeniedException(Exception ex){
         log.warn("Authorization denied: {}", ex.getMessage());
         var body = new ErrorResponse(
                 ErrorCode.FORBIDDEN.name(),

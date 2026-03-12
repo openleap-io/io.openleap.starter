@@ -36,6 +36,7 @@ public final class IdentityHolder {
     private static final ThreadLocal<UUID> USER = new ThreadLocal<>();
     private static final ThreadLocal<Set<String>> ROLES = new ThreadLocal<>();
     private static final ThreadLocal<Set<String>> SCOPES = new ThreadLocal<>();
+    private static final ThreadLocal<UUID> PRINCIPAL = new ThreadLocal<>();
 
     private IdentityHolder() {}
 
@@ -61,6 +62,18 @@ public final class IdentityHolder {
 
     public static UUID getUserId() {
         return USER.get();
+    }
+
+    public static void setPrincipalId(UUID principalId) {
+        if (principalId == null) {
+            PRINCIPAL.remove();
+        } else {
+            PRINCIPAL.set(principalId);
+        }
+    }
+
+    public static UUID getPrincipalId() {
+        return PRINCIPAL.get();
     }
 
     public static void setRoles(Set<String> roles) {
@@ -92,6 +105,7 @@ public final class IdentityHolder {
     public static void clear() {
         TENANT.remove();
         USER.remove();
+        PRINCIPAL.remove();
         ROLES.remove();
         SCOPES.remove();
     }

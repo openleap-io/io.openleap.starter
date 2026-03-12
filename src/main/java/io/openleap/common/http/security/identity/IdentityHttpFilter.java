@@ -60,6 +60,7 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
     public static final String HDR_REQUEST_ID = "X-Request-Id";
     public static final String TENANT_ID = "tenantId";
     public static final String USER_ID = "userId";
+    public static final String PRINCIPAL_ID = "principalId";
 
     private final SecurityProperties olStarterServiceProperties;
 
@@ -80,12 +81,14 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
             // Bridge to MDC for logging
             putMdc(TENANT_ID, uuidToStringSafe(IdentityHolder.getTenantId()));
             putMdc(USER_ID, uuidToStringSafe(IdentityHolder.getUserId()));
+            putMdc(PRINCIPAL_ID, uuidToStringSafe(IdentityHolder.getPrincipalId()));
             putMdc(HDR_REQUEST_ID, firstNonBlank(request.getHeader(HDR_REQUEST_ID), UUID.randomUUID().toString()));
             filterChain.doFilter(request, response);
         } finally {
             // Clear both MDC and IdentityHolder to avoid leakage across threads
             MDC.remove(TENANT_ID);
             MDC.remove(USER_ID);
+            MDC.remove(PRINCIPAL_ID);
             IdentityHolder.clear();
         }
     }
@@ -94,11 +97,15 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
         // Values may be absent; we do not enforce validation at HTTP layer
         String tenantId = firstNonBlank(request.getHeader(HDR_TENANT), request.getHeader(TENANT_ID));
         String userId = firstNonBlank(request.getHeader(HDR_USER), request.getHeader(USER_ID));
+        String principalId = firstNonBlank(request.getHeader(PRINCIPAL_ID));
         if (isNotBlank(tenantId)) {
             uuidOrNull(tenantId).ifPresent(IdentityHolder::setTenantId);
         }
         if (isNotBlank(userId)) {
             uuidOrNull(userId).ifPresent(IdentityHolder::setUserId);
+        }
+        if (isNotBlank(principalId)) {
+            uuidOrNull(principalId).ifPresent(IdentityHolder::setPrincipalId);
         }
         IdentityHolder.setScopes(parseCsvHeader(request.getHeader(HDR_SCOPES)));
         IdentityHolder.setRoles(parseCsvHeader(request.getHeader(HDR_ROLES)));
@@ -131,8 +138,10 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
         // Extract values
         Optional<UUID> tenant = findUuidClaim(claims, TENANT_ID, "tenantid", "tenant_id");
         Optional<UUID> user = findUuidClaim(claims, USER_ID, "userid", "user_id", "sub", "subject");
+        Optional<UUID> principal = findUuidClaim(claims, PRINCIPAL_ID, "principal_id");
         tenant.ifPresent(IdentityHolder::setTenantId);
         user.ifPresent(IdentityHolder::setUserId);
+        principal.ifPresent(IdentityHolder::setPrincipalId);
 
         Set<String> roles = claimAsStringSet(claims, "roles");
         Set<String> scope = scopesFromClaim(claims);
