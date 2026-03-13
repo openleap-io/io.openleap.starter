@@ -18,6 +18,8 @@ jobs:
       contents: read
       packages: write
       checks: write
+      pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout code
@@ -44,7 +46,7 @@ jobs:
               <server>
                 <id>github-openleap-parent</id>
                 <username>${env.GITHUB_ACTOR}</username>
-                <password>${env.GITHUB_TOKEN}</password>
+                <password>${env.GH_PACKAGES_TOKEN}</password>
               </server>
             </servers>
           </settings>
@@ -55,6 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
@@ -65,7 +68,7 @@ jobs:
           reporter: java-junit
 
       - name: Scan for vulnerabilities
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.34.2
         with:
           scan-type: fs
           scan-ref: .
@@ -78,4 +81,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
