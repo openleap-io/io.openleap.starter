@@ -10,7 +10,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-// TODO: (itaseski): Response body logging is unmasked — sensitive fields are exposed in plain text.
+// TODO: (itaseski): Request/response body/headers logging is unmasked — sensitive fields are exposed in plain text.
 //  Restrict to development environments or implement field-level masking before enabling in production.
 @Slf4j
 public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
