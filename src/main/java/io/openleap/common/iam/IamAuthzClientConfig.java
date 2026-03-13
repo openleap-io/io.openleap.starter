@@ -1,4 +1,4 @@
-package io.openleap.common.http.iam;
+package io.openleap.common.iam;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package io.openleap.common.http.iam;
+package io.openleap.common.iam;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

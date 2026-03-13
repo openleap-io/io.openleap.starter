@@ -1,6 +1,6 @@
-package io.openleap.common.http.iam;
+package io.openleap.common.iam;
 
-import io.openleap.common.http.iam.dto.CheckPermissionResponseDto;
+import io.openleap.common.iam.dto.CheckPermissionResponseDto;
 
 public class PermissionDeniedException extends RuntimeException {
 

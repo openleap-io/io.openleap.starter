@@ -1,4 +1,4 @@
-package io.openleap.common.http.iam.dto;
+package io.openleap.common.iam.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 

@@ -1,4 +1,4 @@
-package io.openleap.common.http.iam;
+package io.openleap.common.iam;
 
 import java.lang.annotation.*;
 

@@ -1,7 +1,7 @@
-package io.openleap.common.http.iam;
+package io.openleap.common.iam;
 
-import io.openleap.common.http.iam.dto.CheckPermissionRequestDto;
-import io.openleap.common.http.iam.dto.CheckPermissionResponseDto;
+import io.openleap.common.iam.dto.CheckPermissionRequestDto;
+import io.openleap.common.iam.dto.CheckPermissionResponseDto;
 import io.openleap.common.http.security.identity.IdentityHolder;
 import org.springframework.stereotype.Service;
 
