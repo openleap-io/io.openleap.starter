@@ -22,26 +22,53 @@
  */
 package io.openleap.common.http.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Profile({"keycloak"})
 @Configuration
 public class SecurityKeycloakConfig {
 
+    @Value("${keycloak.server-url}")
+    private String keycloakBaseUrl;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public JwtIssuerAuthenticationManagerResolver authenticationManagerResolver() {
+        Map<String, AuthenticationManager> managers = new ConcurrentHashMap<>();
+        return new JwtIssuerAuthenticationManagerResolver(issuer -> {
+            if (!issuer.startsWith(keycloakBaseUrl + "/realms/")) {
+                throw new IllegalArgumentException("Untrusted issuer: " + issuer);
+            }
+            return managers.computeIfAbsent(issuer, i -> {
+                JwtDecoder decoder = JwtDecoders.fromIssuerLocation(i);
+                JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
+                provider.setJwtAuthenticationConverter(customJwtAuthenticationConverter());
+                return provider::authenticate;
+            });
+        });
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtIssuerAuthenticationManagerResolver authenticationManagerResolver) throws Exception {
         http.authorizeHttpRequests(
                         authorize ->
                                 authorize
                                         .requestMatchers("/swagger-ui/**", "/v3/**", "/actuator/health/**", "/actuator/health").permitAll()
                                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter())));
+                .oauth2ResourceServer(oauth2 -> oauth2.authenticationManagerResolver(authenticationManagerResolver));
 
         return http.build();
     }
