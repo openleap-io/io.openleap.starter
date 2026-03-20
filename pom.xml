@@ -13,7 +13,7 @@
 
     <groupId>io.openleap.core</groupId>
     <artifactId>core-service-parent</artifactId>
-    <version>3.0.4-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Core Service Parent</name>
     <description>OpenLeap.io core modules — multi-module parent POM</description>
