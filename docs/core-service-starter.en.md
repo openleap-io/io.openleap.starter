@@ -29,21 +29,22 @@ The Core-Service Starter provides a comprehensive set of features for building m
 
 | Package | Description |
 |---------|-------------|
-| `io.openleap.common.http` | HTTP infrastructure: security, identity, error handling, telemetry |
-| `io.openleap.common.messaging` | RabbitMQ messaging: events, commands, outbox pattern |
-| `io.openleap.common.persistence` | JPA entities, auditing, specifications |
-| `io.openleap.common.lock` | Distributed locking using PostgreSQL advisory locks |
-| `io.openleap.common.idempotency` | Idempotency key management |
-| `io.openleap.common.domain` | Domain primitives (BusinessId, DomainEntity) |
-| `io.openleap.common.util` | Utility classes |
+| `io.openleap.core.http` | HTTP infrastructure: security, identity, error handling, telemetry |
+| `io.openleap.core.messaging` | RabbitMQ messaging: events, commands, outbox pattern |
+| `io.openleap.core.persistence` | JPA entities, auditing, specifications |
+| `io.openleap.core.lock` | Distributed locking using PostgreSQL advisory locks |
+| `io.openleap.core.idempotency` | Idempotency key management |
+| `io.openleap.core.domain` | Domain primitives (BusinessId, DomainEntity) |
+| `io.openleap.core.util` | Utility classes |
 
 ### Quick Start (Maven)
 
 ```xml
+
 <dependency>
-    <groupId>io.openleap.common</groupId>
-    <artifactId>core-service</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+   <groupId>io.openleap.coreio.openleap.core</groupId>
+   <artifactId>core-service</artifactId>
+   <version>3.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -61,7 +62,7 @@ The Core-Service Starter provides a comprehensive set of features for building m
 
 ### MessagingProperties (`ol.messaging`)
 
-Located in `io.openleap.common.messaging.config.MessagingProperties`
+Located in `io.openleap.core.messaging.config.MessagingProperties`
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -87,7 +88,7 @@ Located in `io.openleap.common.messaging.config.MessagingProperties`
 
 ### OpenleapSecurityProperties (`ol.security`)
 
-Located in `io.openleap.common.http.security.config.SecurityProperties`
+Located in `io.openleap.core.http.security.config.SecurityProperties`
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -129,7 +130,7 @@ ol:
 
 ## HTTP & Security
 
-Located in `io.openleap.common.http`
+Located in `io.openleap.core.http`
 
 ### Security Modes
 
@@ -195,7 +196,7 @@ class OrderController {
 
 ## Messaging (RabbitMQ)
 
-Located in `io.openleap.common.messaging`
+Located in `io.openleap.core.messaging`
 
 ### Key Classes
 
@@ -310,7 +311,7 @@ class OrderFacade {
 
 ## Outbox Pattern
 
-Located in `io.openleap.common.messaging`
+Located in `io.openleap.core.messaging`
 
 The outbox pattern ensures reliable message delivery by persisting events in the database before dispatching to RabbitMQ.
 
@@ -350,7 +351,7 @@ Configure the dispatcher type using `ol.messaging.outbox.dispatcher.type`:
 
 ## Persistence & Auditing
 
-Located in `io.openleap.common.persistence`
+Located in `io.openleap.core.persistence`
 
 ### Key Classes
 
@@ -391,7 +392,7 @@ List<Order> orders = orderRepository.findAll(spec);
 
 ## Distributed Locking
 
-Located in `io.openleap.common.lock`
+Located in `io.openleap.core.lock`
 
 Provides distributed locking using PostgreSQL advisory locks.
 
@@ -440,7 +441,7 @@ class PaymentService {
 
 ## Idempotency
 
-Located in `io.openleap.common.idempotency`
+Located in `io.openleap.core.idempotency`
 
 Prevents duplicate processing of operations using idempotency keys.
 
@@ -480,7 +481,7 @@ class PaymentService {
 
 ## Telemetry
 
-Located in `io.openleap.common.http.telemetry`
+Located in `io.openleap.core.http.telemetry`
 
 ### Key Classes
 
@@ -521,7 +522,7 @@ class OrderController {
 
 ## Utilities
 
-Located in `io.openleap.common.util`
+Located in `io.openleap.core.util`
 
 | Class | Description |
 |-------|-------------|
@@ -533,7 +534,7 @@ Located in `io.openleap.common.util`
 
 ### Domain Primitives
 
-Located in `io.openleap.common.domain`
+Located in `io.openleap.core.domain`
 
 | Class | Description |
 |-------|-------------|
@@ -544,7 +545,7 @@ Located in `io.openleap.common.domain`
 
 ## Package Reference
 
-### `io.openleap.common.http.security`
+### `io.openleap.core.http.security`
 
 | File | Description |
 |------|-------------|
@@ -557,7 +558,7 @@ Located in `io.openleap.common.domain`
 | `NosecHeaderFilter.java` | Filter for nosec mode headers |
 | `CustomJwtGrantedAuthoritiesConverter.java` | JWT to authorities converter |
 
-### `io.openleap.common.http.security.identity`
+### `io.openleap.core.http.security.identity`
 
 | File | Description |
 |------|-------------|
@@ -568,7 +569,7 @@ Located in `io.openleap.common.domain`
 | `AuthenticatedIdentity.java` | Identity data record |
 | `IdentityWebConfig.java` | Web MVC configuration |
 
-### `io.openleap.common.http.error`
+### `io.openleap.core.http.error`
 
 | File | Description |
 |------|-------------|
@@ -577,7 +578,7 @@ Located in `io.openleap.common.domain`
 | `ErrorCode.java` | Error code catalog |
 | `ErrorResponse.java` | Error response DTO |
 
-### `io.openleap.common.http.telemetry`
+### `io.openleap.core.http.telemetry`
 
 | File | Description |
 |------|-------------|
@@ -585,7 +586,7 @@ Located in `io.openleap.common.domain`
 | `OtelConfig.java` | OpenTelemetry configuration |
 | `TraceIdFilter.java` | Trace ID filter |
 
-### `io.openleap.common.messaging`
+### `io.openleap.core.messaging`
 
 | File | Description |
 |------|-------------|
@@ -594,7 +595,7 @@ Located in `io.openleap.common.domain`
 | `MessageCoverageTracker.java` | Coverage tracking |
 | `MessageCoverageReport.java` | Coverage report |
 
-### `io.openleap.common.messaging.config`
+### `io.openleap.core.messaging.config`
 
 | File | Description |
 |------|-------------|
@@ -604,7 +605,7 @@ Located in `io.openleap.common.domain`
 | `MessagingIdentityClearingAdvice.java` | Identity cleanup advice |
 | `MessageTopologyConfiguration.java` | Exchange/queue topology |
 
-### `io.openleap.common.messaging.event`
+### `io.openleap.core.messaging.event`
 
 | File | Description |
 |------|-------------|
@@ -612,7 +613,7 @@ Located in `io.openleap.common.domain`
 | `BaseDomainEvent.java` | Base implementation |
 | `EventPublisher.java` | Transactional publisher |
 
-### `io.openleap.common.messaging.command`
+### `io.openleap.core.messaging.command`
 
 | File | Description |
 |------|-------------|
@@ -622,7 +623,7 @@ Located in `io.openleap.common.domain`
 | `CommandGateway.java` | Gateway interface |
 | `SimpleCommandBus.java` | Default implementation |
 
-### `io.openleap.common.messaging.service`
+### `io.openleap.core.messaging.service`
 
 | File | Description |
 |------|-------------|
@@ -631,7 +632,7 @@ Located in `io.openleap.common.domain`
 | `OutboxAdminService.java` | Admin operations |
 | `MetricsService.java` | Metrics aggregation |
 
-### `io.openleap.common.messaging.dispatcher`
+### `io.openleap.core.messaging.dispatcher`
 
 | File | Description |
 |------|-------------|
@@ -641,14 +642,14 @@ Located in `io.openleap.common.domain`
 | `RabbitMqOutboxDispatcher.java` | RabbitMQ implementation |
 | `LoggingOutboxDispatcher.java` | Logging stub |
 
-### `io.openleap.common.messaging.entity`
+### `io.openleap.core.messaging.entity`
 
 | File | Description |
 |------|-------------|
 | `OutboxEvent.java` | Outbox JPA entity |
 | `OutboxEventId.java` | Composite ID |
 
-### `io.openleap.common.persistence`
+### `io.openleap.core.persistence`
 
 | File | Description |
 |------|-------------|
@@ -657,7 +658,7 @@ Located in `io.openleap.common.domain`
 | `VersionedEntity.java` | Versioned entity |
 | `SpecificationBuilder.java` | Query specification builder |
 
-### `io.openleap.common.persistence.config`
+### `io.openleap.core.persistence.config`
 
 | File | Description |
 |------|-------------|
@@ -666,7 +667,7 @@ Located in `io.openleap.common.domain`
 | `AuditingProviderConfig.java` | Auditor provider |
 | `TenantRlsAspect.java` | Row-level security |
 
-### `io.openleap.common.lock`
+### `io.openleap.core.lock`
 
 | File | Description |
 |------|-------------|
@@ -676,7 +677,7 @@ Located in `io.openleap.common.domain`
 | `SessionAdvisoryLock.java` | PostgreSQL advisory lock |
 | `DistributedLockConfig.java` | Lock configuration |
 
-### `io.openleap.common.idempotency`
+### `io.openleap.core.idempotency`
 
 | File | Description |
 |------|-------------|
@@ -693,7 +694,7 @@ Located in `io.openleap.common.domain`
 1. **Add dependency** to your `pom.xml`:
    ```xml
    <dependency>
-       <groupId>io.openleap.common</groupId>
+       <groupId>io.openleap.coreio.openleap.core</groupId>
        <artifactId>core-service</artifactId>
        <version>3.0.0-SNAPSHOT</version>
    </dependency>

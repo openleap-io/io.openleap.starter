@@ -48,18 +48,19 @@ The JWT issued by Keycloak contains IAM-domain identity claims that the service 
 
 ### 1. Add the Starter Dependency
 
-The IAM module ships inside `io.openleap.common:core-service` (via `io.openleap.common:starter`). Pull it in via the parent BOM — no explicit version needed:
+The IAM module ships inside `io.openleap.core:core-service` (via `io.openleap.core:starter`). Pull it in via the parent BOM — no explicit version needed:
 
 ```xml
+
 <dependency>
-    <groupId>io.openleap.common</groupId>
+    <groupId>io.openleap.coreio.openleap.core</groupId>
     <artifactId>core-service</artifactId>
 </dependency>
 ```
 
 ### 2. Register the IAM Package Marker in Component Scan
 
-The starter ships beans in package `io.openleap.common.iam`. Because your application's `@SpringBootApplication` only scans its own package by default, you must explicitly include the IAM marker:
+The starter ships beans in package `io.openleap.core.iam`. Because your application's `@SpringBootApplication` only scans its own package by default, you must explicitly include the IAM marker:
 
 ```java
 @SpringBootApplication
@@ -72,7 +73,7 @@ The starter ships beans in package `io.openleap.common.iam`. Because your applic
 public class YourServiceApplication { ... }
 ```
 
-`IamAuthzPackageMarker` is a no-op interface in `io.openleap.common.iam` that anchors component scanning to that package. Without it, `AuthorizationService`, `PermissionCheckAspect`, `IamAuthzClientConfig`, and related beans will not be loaded.
+`IamAuthzPackageMarker` is a no-op interface in `io.openleap.core.iam` that anchors component scanning to that package. Without it, `AuthorizationService`, `PermissionCheckAspect`, `IamAuthzClientConfig`, and related beans will not be loaded.
 
 ### 3. Configure the IAM Authz URL
 
@@ -296,7 +297,7 @@ This allows tests to run without Keycloak or IAM Authz Service running.
 
 ## Checklist for a New Service
 
-- [ ] Include `io.openleap.common:core-service` in `pom.xml`
+- [ ] Include `io.openleap.core:core-service` in `pom.xml`
 - [ ] Add `IamAuthzPackageMarker.class` and `SecurityPackageMarker.class` to `@ComponentScan`
 - [ ] Set `iam.authz.url` in `application.yml` (and environment-specific overrides)
 - [ ] Set `ol.security.http.mode: iamsec` in production/k8s config

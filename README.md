@@ -7,8 +7,9 @@ A Spring Boot starter library providing common infrastructure for building micro
 Add the dependency to your `pom.xml`:
 
 ```xml
+
 <dependency>
-    <groupId>io.openleap.common</groupId>
+    <groupId>io.openleap.coreio.openleap.core</groupId>
     <artifactId>core-service</artifactId>
     <version>3.0.1-SNAPSHOT</version>
 </dependency>
@@ -20,13 +21,13 @@ Add the dependency to your `pom.xml`:
 
 | Feature          | Package                             | 
 |------------------|-------------------------------------| 
-| HTTP & Security  | `io.openleap.common.http`           |
-| Error Handling   | `io.openleap.common.http.error`     | 
-| Messaging        | `io.openleap.common.messaging`      | 
-| Persistence      | `io.openleap.common.persistence`    | 
-| Distributed Lock | `io.openleap.common.lock`           | 
-| Idempotency      | `io.openleap.common.idempotency`    | 
-| Telemetry        | `io.openleap.common.http.telemetry` | 
+| HTTP & Security  | `io.openleap.core.http`           |
+| Error Handling   | `io.openleap.core.http.error`     | 
+| Messaging        | `io.openleap.core.messaging`      | 
+| Persistence      | `io.openleap.core.persistence`    | 
+| Distributed Lock | `io.openleap.core.lock`           | 
+| Idempotency      | `io.openleap.core.idempotency`    | 
+| Telemetry        | `io.openleap.core.http.telemetry` | 
 
 ---
 
