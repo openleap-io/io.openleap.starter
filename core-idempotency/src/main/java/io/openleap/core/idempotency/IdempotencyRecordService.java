@@ -22,7 +22,6 @@
  */
 package io.openleap.core.idempotency;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -35,7 +34,6 @@ import java.util.UUID;
  * Command-level idempotency backed by the shared idempotency table.
  * Stores a unique key per processed command and allows duplicate detection.
  */
-@Service
 public class IdempotencyRecordService {
 
     private final IdempotencyRecordRepository repository;

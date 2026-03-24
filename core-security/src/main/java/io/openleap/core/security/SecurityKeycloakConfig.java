@@ -62,7 +62,7 @@ public class SecurityKeycloakConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtIssuerAuthenticationManagerResolver authenticationManagerResolver) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtIssuerAuthenticationManagerResolver authenticationManagerResolver) {
         http.authorizeHttpRequests(
                         authorize ->
                                 authorize

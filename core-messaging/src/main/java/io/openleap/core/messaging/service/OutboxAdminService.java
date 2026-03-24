@@ -26,7 +26,6 @@ package io.openleap.core.messaging.service;
 import io.openleap.core.messaging.entity.OutboxEvent;
 import io.openleap.core.messaging.repository.OutboxRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -36,7 +35,6 @@ import java.util.List;
 /**
  * Administrative helper for Outbox DLQ handling: list parked (failed) records and trigger replay.
  */
-@Service
 public class OutboxAdminService {
 
     private final OutboxRepository outboxRepository;

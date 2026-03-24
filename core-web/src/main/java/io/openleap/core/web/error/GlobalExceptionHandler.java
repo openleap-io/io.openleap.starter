@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
-    public ResponseEntity<Object> handleAuthorizationDeniedException(Exception ex){
+    public ResponseEntity<Object> handleAuthorizationDeniedException(Exception ex) {
         log.warn("Authorization denied: {}", ex.getMessage());
         var body = new ErrorResponse(
                 ErrorCode.FORBIDDEN.name(),

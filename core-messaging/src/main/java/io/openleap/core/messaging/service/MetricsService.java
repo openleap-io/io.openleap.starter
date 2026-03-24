@@ -26,7 +26,6 @@ import io.openleap.core.messaging.config.MessagingProperties;
 import io.openleap.core.messaging.entity.OutboxEvent;
 import io.openleap.core.messaging.repository.OutboxRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +38,6 @@ import java.util.Map;
  *
  * Author: Dr. Sören Kemmann
  */
-@Service
 public class MetricsService {
 
     private final OutboxRepository outboxRepository;

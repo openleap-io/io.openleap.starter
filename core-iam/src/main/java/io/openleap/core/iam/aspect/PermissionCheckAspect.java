@@ -3,10 +3,8 @@ package io.openleap.core.iam.aspect;
 import io.openleap.core.iam.AuthorizationService;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.stereotype.Component;
 
 @Aspect
-@Component
 public class PermissionCheckAspect {
 
     private final AuthorizationService authorizationService;

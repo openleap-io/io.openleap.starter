@@ -5,12 +5,10 @@ import io.openleap.core.common.identity.IdentityHolder;
 import io.openleap.core.iam.client.IamAuthzClient;
 import io.openleap.core.iam.dto.CheckPermissionRequest;
 import io.openleap.core.iam.dto.CheckPermissionResponse;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
 
-@Service
 public class AuthorizationService {
 
     private final IamAuthzClient iamAuthzClient;

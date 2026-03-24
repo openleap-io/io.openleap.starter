@@ -36,7 +36,6 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -45,11 +44,10 @@ import java.util.*;
 /**
  * Property-driven identity extraction for HTTP requests.
  * Modes:
- *  - simplesec: extract JWT (scopes, roles, tenantId, userId) from Spring Security context/JWT header
- *  - nosec: extract from plain headers (X-Tenant-Id, X-User-Id, X-Scopes, X-Roles)
+ * - simplesec: extract JWT (scopes, roles, tenantId, userId) from Spring Security context/JWT header
+ * - nosec: extract from plain headers (X-Tenant-Id, X-User-Id, X-Scopes, X-Roles)
  * Always clears IdentityHolder in finally.
  */
-@Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10) // after TraceIdFilter
 public class IdentityHttpFilter extends OncePerRequestFilter {
 
@@ -209,17 +207,24 @@ public class IdentityHttpFilter extends OncePerRequestFilter {
     }
 
     private static Optional<UUID> uuidOrNull(String v) {
-        try { return Optional.of(UUID.fromString(v.trim())); } catch (Exception e) { return Optional.empty(); }
+        try {
+            return Optional.of(UUID.fromString(v.trim()));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
-    private static boolean isNotBlank(String s) { return s != null && !s.trim().isEmpty(); }
+    private static boolean isNotBlank(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
 
     private SecurityProperties.Mode resolveMode() {
         try {
             if (olStarterServiceProperties != null && olStarterServiceProperties.getHttp().getMode() != null) {
                 return olStarterServiceProperties.getHttp().getMode();
             }
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
         return SecurityProperties.Mode.nosec;
     }
 

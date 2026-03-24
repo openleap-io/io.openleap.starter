@@ -1,21 +1,22 @@
 package io.openleap.core.messaging.event;
 
+import io.openleap.core.MessagingTestApplication;
 import io.openleap.core.TestConfig;
 import io.openleap.core.messaging.MessagingConstants;
 import io.openleap.core.messaging.RoutingKey;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.rabbitmq.RabbitMQContainer;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.HashMap;
 
@@ -24,10 +25,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(classes = TestConfig.class)
+@SpringBootTest(classes = {MessagingTestApplication.class, TestConfig.class})
 @Testcontainers
 @ActiveProfiles("test")
-@Disabled("Test failing after multi module refactor, needs to be fixed")
 class EventPublisherIT {
 
     @Container
@@ -68,8 +68,7 @@ class EventPublisherIT {
                 .atMost(5, SECONDS)
                 .pollInterval(500, MILLISECONDS)
                 .untilAsserted(() -> {
-                    String jsonMessage = (String) rabbitTemplate.receiveAndConvert(MessagingConstants.OUTBOX_QUEUE);
-                    BaseDomainEvent baseDomainEvent = jsonMapper.readValue(jsonMessage, BaseDomainEvent.class);
+                    BaseDomainEvent baseDomainEvent = rabbitTemplate.receiveAndConvert(MessagingConstants.OUTBOX_QUEUE, new ParameterizedTypeReference<>() {});
                     assertThat(baseDomainEvent)
                             .isNotNull()
                             .usingRecursiveComparison()

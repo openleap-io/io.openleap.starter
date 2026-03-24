@@ -1,12 +1,11 @@
 name: Build and Deploy
 
 on:
-  # TODO (itaseski): Enable push and PR triggers once we have a stable multi module release process in place
   workflow_dispatch:
-#  push:
-#    branches: [ main ]
-#  pull_request:
-#    branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -45,6 +44,7 @@ jobs:
                 <username>${env.GITHUB_ACTOR}</username>
                 <password>${env.GITHUB_TOKEN}</password>
               </server>
+              <!-- TODO: Remove - no longer needed after dropping io.openleap.parent -->
               <server>
                 <id>github-openleap-parent</id>
                 <username>${env.GITHUB_ACTOR}</username>
@@ -59,14 +59,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # TODO: Remove - no longer needed
 
       - name: Publish test results
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: JUnit Tests
-          path: target/surefire-reports/*.xml
+          path: '**/target/surefire-reports/*.xml'
           reporter: java-junit
 
       - name: Scan for vulnerabilities
@@ -83,5 +83,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
-          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
-
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }} # TODO: Remove - no longer needed

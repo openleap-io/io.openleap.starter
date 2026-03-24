@@ -5,15 +5,10 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Configuration
-@EnableAutoConfiguration
-@EnableAspectJAutoProxy
 public class TestConfig {
 
     @Bean
@@ -28,10 +23,4 @@ public class TestConfig {
                 .to(eventsExchange)
                 .with(MessagingConstants.OUTBOX_ROUTING_KEY);
     }
-
-    @Bean
-    public JsonMapper jsonMapper() {
-        return new JsonMapper();
-    }
-
 }

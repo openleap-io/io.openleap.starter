@@ -27,7 +27,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
@@ -38,7 +37,6 @@ import java.util.UUID;
  * Guarded at runtime: on non-PostgreSQL databases (e.g., H2) the statement will fail and is ignored.
  */
 @Aspect
-@Component
 public class TenantRlsAspect {
 
     private final JdbcTemplate jdbcTemplate;
@@ -47,14 +45,14 @@ public class TenantRlsAspect {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Around("@annotation(org.springframework.transaction.annotation.Transactional) || within(@org.springframework.transaction.annotation.Transactional *) || execution(* io.openleap.fi.acc.service..*(..))")
+    @Around("@annotation(org.springframework.transaction.annotation.Transactional) || within(@org.springframework.transaction.annotation.Transactional *) || @annotation(io.openleap.core.persistence.tenant.TenantAware)")
     public Object setTenantIdForTx(ProceedingJoinPoint pjp) throws Throwable {
         UUID tenant = IdentityHolder.getTenantId();
         if (tenant != null) {
             try {
                 // Scope to current transaction if any; on H2 this will throw and is ignored.
                 jdbcTemplate.execute("set local app.tenant_id = '" + tenant + "'");
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // Non-PostgreSQL or unavailable variable; ignore
             }
         }

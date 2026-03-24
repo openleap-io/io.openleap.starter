@@ -26,7 +26,6 @@ import io.openleap.core.lock.aspect.DistributedLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +38,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Uses publisher confirms to mark records as SENT only after broker ack.
  */
 @Slf4j
-@Component
 public class OutboxOrchestrator {
 
     private final OutboxProcessor outboxProcessor;

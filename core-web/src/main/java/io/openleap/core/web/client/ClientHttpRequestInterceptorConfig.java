@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
-class ClientHttpRequestInterceptorConfig {
+public class ClientHttpRequestInterceptorConfig {
 
     @Bean
     @ConditionalOnClass(name = "org.springframework.security.core.context.SecurityContextHolder")

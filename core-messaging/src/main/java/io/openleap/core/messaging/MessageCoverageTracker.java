@@ -22,13 +22,10 @@
  */
 package io.openleap.core.messaging;
 
-import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class MessageCoverageTracker {
 
     private final Set<String> expectedMessages = ConcurrentHashMap.newKeySet();

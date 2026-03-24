@@ -25,7 +25,6 @@ package io.openleap.core.messaging.command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,6 @@ import java.util.Map;
  * Simple in-memory command bus that routes commands to Spring-managed handlers.
  * This uses synchronous invocation and relies on transactional handlers.
  */
-@Component
 public class SimpleCommandBus implements CommandGateway {
 
     private static final Logger log = LoggerFactory.getLogger(SimpleCommandBus.class);

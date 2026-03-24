@@ -7,14 +7,12 @@ import io.openleap.core.messaging.entity.OutboxEvent;
 import io.openleap.core.messaging.repository.OutboxRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-@Component
 @Slf4j
 public class OutboxProcessor {
 

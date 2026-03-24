@@ -30,11 +30,9 @@ import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
 public class MessagingIdentityPostProcessor implements MessagePostProcessor {
 
     public static final String HDR_TENANT = "x-tenant-id";
@@ -45,6 +43,7 @@ public class MessagingIdentityPostProcessor implements MessagePostProcessor {
 
     private final SecurityProperties olStarterServiceProperties;
 
+    // TODO (itaseski): Check if SecurityProperties will be autowired on enabled security.
     public MessagingIdentityPostProcessor(Optional<SecurityProperties> olStarterServiceProperties) {
         this.olStarterServiceProperties = olStarterServiceProperties.orElse(null);
     }

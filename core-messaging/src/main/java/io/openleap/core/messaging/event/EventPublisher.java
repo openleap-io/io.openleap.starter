@@ -31,7 +31,6 @@ import io.openleap.core.messaging.entity.OutboxEventId;
 import io.openleap.core.messaging.repository.OutboxRepository;
 import io.openleap.core.messaging.service.OutboxOrchestrator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -45,7 +44,6 @@ import java.util.Optional;
  * Transactional messaging publisher that writes to the Outbox table.
  * A separate dispatcher will forward records to RabbitMQ.
  */
-@Service
 public class EventPublisher {
 
     private final OutboxRepository outboxRepository;

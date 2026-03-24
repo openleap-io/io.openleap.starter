@@ -13,9 +13,8 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: false
 
+
 ol:
-  iam:
-    authz-base-url: ${OL_IAM_AUTHZ_BASE_URL:http://iam-authz-svc:8082}
   messaging:
     enabled: true
     events-exchange: ol.exchange.events
@@ -23,7 +22,7 @@ ol:
     registry:
       enabled: false
       url: http://localhost:8990
-      format: avro
+      format: application/*+avro
     outbox:
       dispatcher:
         enabled: true
@@ -42,9 +41,3 @@ ol:
       initial-interval: 1000
       multiplier: 2.0
       max-interval: 10000
-  tracing:
-    otel:
-      enabled: false
-      endpoint: http://localhost:4317
-  security:
-    mode: nosec

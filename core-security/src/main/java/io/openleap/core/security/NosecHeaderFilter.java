@@ -30,7 +30,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -40,8 +39,6 @@ import java.util.UUID;
  * Once-per-request filter that extracts tenant/user ids from headers and stores them in IdentityHolder.
  * Active only when profile "nosec" is enabled. Headers are optional; invalid values are logged and ignored.
  */
-@Component
-@Profile("nosec")
 public class NosecHeaderFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(NosecHeaderFilter.class);

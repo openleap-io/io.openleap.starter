@@ -13,12 +13,10 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
 @Aspect
-@Component
 @Slf4j
 public class IdempotentAspect {
 

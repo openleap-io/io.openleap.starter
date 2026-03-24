@@ -33,6 +33,7 @@ class IdentityContextArgumentResolverTest {
     void setup() {
         IdentityHolder.setTenantId(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"));
         IdentityHolder.setUserId(UUID.fromString("660e8400-e29b-41d4-a716-446655441111"));
+        IdentityHolder.setPrincipalId((UUID.fromString("770e8400-e29b-41d4-a716-446655442222")));
         IdentityHolder.setRoles(Set.of("ROLE_USER"));
         IdentityHolder.setScopes(Set.of("read", "write"));
 
@@ -96,6 +97,7 @@ class IdentityContextArgumentResolverTest {
                 .isInstanceOf(IdentityContext.class)
                 .hasFieldOrPropertyWithValue("tenantId", UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))
                 .hasFieldOrPropertyWithValue("userId", UUID.fromString("660e8400-e29b-41d4-a716-446655441111"))
+                .hasFieldOrPropertyWithValue("principalId", UUID.fromString("770e8400-e29b-41d4-a716-446655442222"))
                 .hasFieldOrPropertyWithValue("roles", Set.of("ROLE_USER"))
                 .hasFieldOrPropertyWithValue("scopes", Set.of("read", "write"));
     }

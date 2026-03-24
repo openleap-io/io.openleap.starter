@@ -30,8 +30,6 @@ import org.springframework.data.domain.AuditorAware;
 import java.util.Optional;
 import java.util.UUID;
 
-;
-
 /**
  * Provides Spring Data JPA AuditorAware backed by IdentityHolder so that
  *

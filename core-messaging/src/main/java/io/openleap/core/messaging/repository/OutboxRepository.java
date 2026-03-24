@@ -25,11 +25,9 @@ package io.openleap.core.messaging.repository;
 import io.openleap.core.messaging.entity.OutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface OutboxRepository extends JpaRepository<OutboxEvent, Long> {
 
     @Query("select o from OutboxEvent o where o.published = false and (o.nextAttemptAt is null or o.nextAttemptAt <= CURRENT_TIMESTAMP) order by o.createdAt asc")

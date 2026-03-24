@@ -34,9 +34,9 @@ import java.util.UUID;
 public final class IdentityHolder {
     private static final ThreadLocal<UUID> TENANT = new ThreadLocal<>();
     private static final ThreadLocal<UUID> USER = new ThreadLocal<>();
+    private static final ThreadLocal<UUID> PRINCIPAL = new ThreadLocal<>();
     private static final ThreadLocal<Set<String>> ROLES = new ThreadLocal<>();
     private static final ThreadLocal<Set<String>> SCOPES = new ThreadLocal<>();
-    private static final ThreadLocal<UUID> PRINCIPAL = new ThreadLocal<>();
 
     private IdentityHolder() {}
 

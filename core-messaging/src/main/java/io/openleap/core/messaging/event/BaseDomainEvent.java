@@ -1,5 +1,6 @@
 package io.openleap.core.messaging.event;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,6 +33,7 @@ public class BaseDomainEvent implements DomainEvent {
         this.metadata = null;
     }
 
+    @JsonCreator
     protected BaseDomainEvent(String aggregateId,
                               String aggregateType,
                               String changeType,

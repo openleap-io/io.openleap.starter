@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.retry.RetryPolicy;
@@ -50,21 +49,25 @@ import org.springframework.core.retry.RetryTemplate;
 import org.springframework.util.backoff.ExponentialBackOff;
 import tools.jackson.databind.json.JsonMapper;
 
-@Configuration
-@EnableConfigurationProperties(MessagingProperties.class)
-@ConditionalOnProperty(prefix = "ol.messaging", name = "enabled", havingValue = "true")
-public class MessagingConfig {
+@Configuration(proxyBeanMethods = false)
+public class AmqpConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(MessagingConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(AmqpConfig.class);
 
     private final MessageCoverageTracker coverageTracker;
 
     private final MessagingProperties olStarterServiceProperties;
 
-    public MessagingConfig(MessageCoverageTracker coverageTracker,
-                           MessagingProperties olStarterServiceProperties) {
+    public AmqpConfig(MessageCoverageTracker coverageTracker,
+                      MessagingProperties olStarterServiceProperties) {
         this.coverageTracker = coverageTracker;
         this.olStarterServiceProperties = olStarterServiceProperties;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JsonMapper jsonMapper() {
+        return JsonMapper.builder().build();
     }
 
     @Bean
@@ -116,7 +119,7 @@ public class MessagingConfig {
             if (olStarterServiceProperties.getRegistry().getFormat() != null) {
                 try {
                     convClass.getMethod("setContentType", String.class)
-                            .invoke(conv, "application/*+avro");
+                            .invoke(conv, olStarterServiceProperties.getRegistry().getFormat());
                 } catch (NoSuchMethodException ignored) {
                     // older versions may not have this, ignore
                 }
@@ -166,6 +169,7 @@ public class MessagingConfig {
     }
 
     @Bean
+    // TODO (itaseski): Why did we add ConditionalOnMissingBean
     @ConditionalOnMissingBean(RabbitTemplate.class)
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter converter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
