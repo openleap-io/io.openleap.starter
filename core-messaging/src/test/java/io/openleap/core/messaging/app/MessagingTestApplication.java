@@ -1,4 +1,4 @@
-package io.openleap.core;
+package io.openleap.core.messaging.app;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

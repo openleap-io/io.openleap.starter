@@ -1,9 +1,9 @@
 package io.openleap.core.messaging.event;
 
-import io.openleap.core.MessagingTestApplication;
 import io.openleap.core.TestConfig;
 import io.openleap.core.messaging.MessagingConstants;
 import io.openleap.core.messaging.RoutingKey;
+import io.openleap.core.messaging.app.MessagingTestApplication;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
