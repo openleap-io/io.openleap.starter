@@ -16,28 +16,7 @@ spring:
 
 ol:
   messaging:
-    enabled: true
     events-exchange: ol.exchange.events
-    coverage: false
-    registry:
-      enabled: false
-      url: http://localhost:8990
-      format: application/*+avro
-    outbox:
-      dispatcher:
-        enabled: true
-        fixed-delay: 1000
-        wakeup-after-commit: true
-        delete-on-ack: false
-        max-attempts: 10
-        confirm-timeout-millis: 5000
-        type: rabbitmq
-    metrics:
-      queues:
-        main: metrics.main
-        dlq: metrics.dlq
-    retry:
-      max-attempts: 3
-      initial-interval: 1000
-      multiplier: 2.0
-      max-interval: 10000
+
+
+

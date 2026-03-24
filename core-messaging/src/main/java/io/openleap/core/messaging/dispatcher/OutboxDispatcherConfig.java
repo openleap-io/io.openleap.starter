@@ -19,7 +19,7 @@ public class OutboxDispatcherConfig {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "ol.messaging.outbox.dispatcher", name = "type", havingValue = "rabbitmq")
+    @ConditionalOnProperty(prefix = "ol.messaging.outbox.dispatcher", name = "type", havingValue = "rabbitmq", matchIfMissing = true)
     public OutboxDispatcher rabbitMqOutboxDispatcher(
             RabbitTemplate rabbitTemplate,
             JsonMapper jsonMapper,
