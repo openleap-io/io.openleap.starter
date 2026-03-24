@@ -27,7 +27,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "ol.messaging")
 public class MessagingProperties {
 
-    private boolean enabled;
     private String eventsExchange;
     private boolean coverage = false;
     private Registry registry = new Registry();
@@ -36,15 +35,6 @@ public class MessagingProperties {
     private Retry retry = new Retry();
 
     // Getters and Setters
-
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 
     public String getEventsExchange() {
         return eventsExchange;

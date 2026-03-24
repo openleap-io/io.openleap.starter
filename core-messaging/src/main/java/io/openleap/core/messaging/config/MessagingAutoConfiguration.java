@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @AutoConfiguration
-@ConditionalOnProperty(prefix = "ol.messaging", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "ol.messaging", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(MessagingProperties.class)
 @Import({AmqpConfig.class, OutboxDispatcherConfig.class, MessagingEntityRegistrar.class, MessagingRepositoryRegistrar.class})
 public class MessagingAutoConfiguration {
