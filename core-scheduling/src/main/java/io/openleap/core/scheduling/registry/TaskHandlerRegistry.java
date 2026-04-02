@@ -5,6 +5,7 @@ import io.openleap.core.scheduling.api.handler.TaskHandler;
 
 import java.util.*;
 
+// TODO (itaseski): Add differentiation between internal and external handlers
 public class TaskHandlerRegistry {
 
     private final Map<String, TaskHandler<?, ?>> handlers = new HashMap<>();
