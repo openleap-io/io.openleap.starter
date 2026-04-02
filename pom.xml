@@ -29,6 +29,7 @@
         <module>core-idempotency</module>
         <module>core-iam</module>
         <module>core-messaging</module>
+        <module>core-scheduling</module>
     </modules>
 
     <properties>
