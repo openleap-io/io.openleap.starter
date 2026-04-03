@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: test-service
+
+scheduling:
+  enabled: true
+
+task:
+  #executor: dbos
+  # general configuration for all executors
+  retry:
+    max-attempts: 1
+    interval-seconds: 1.0
+    backoff-rate: 2.0
+  # specific configuration for dbos executor
+  # TODO (itaseski): Nest under task.dbos.queue
+  queue:
+    name: task-queue
+    concurrency: 10
+    worker-concurrency: 3
+  # specific configuration for in-memory executor
+  in-memory:
+    executor-type: FIXED
+    thread-pool-size: 4
+  web:
+    enabled: true
+  listeners:
+    logging:
+      enabled: false
+    metrics:
+      enabled: false
+    events:
+      enabled: false
+
+dbos:
+  jdbc-url: jdbc:postgresql://localhost:5432/test
+  username: postgres
+  password: dbos
+  admin-server-enabled: false
+  admin-server-port: 3001
+
+# TODO (itaseski): Need to be disabled otherwise spring auto-scans them and causes db issues.
+ol:
+  messaging:
+    enabled: false
+  persistence:
+    enabled: false
+  security:
+    enabled: false

@@ -1,0 +1,15 @@
+meta {
+  name: Get Task Status
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/tasks/:taskId/status
+  body: none
+  auth: none
+}
+
+params:path {
+  taskId:
+}
