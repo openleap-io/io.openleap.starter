@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public abstract class VersionedEntity extends PersistenceEntity {
+public abstract class VersionedEntity extends PersistenceEntity implements Versionable {
 
     @Version
     @Column(name = "version", nullable = false)

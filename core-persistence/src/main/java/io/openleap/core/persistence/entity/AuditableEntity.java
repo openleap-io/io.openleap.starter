@@ -20,7 +20,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public abstract class AuditableEntity extends VersionedEntity {
+public abstract class AuditableEntity extends VersionedEntity implements Auditable {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

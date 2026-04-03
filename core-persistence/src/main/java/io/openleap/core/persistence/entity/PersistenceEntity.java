@@ -34,7 +34,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @EqualsAndHashCode
-public abstract class PersistenceEntity implements Serializable {
+public abstract class PersistenceEntity implements Serializable, Identifiable {
 
     @Id
     @Column(

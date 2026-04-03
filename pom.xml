@@ -30,6 +30,7 @@
         <module>core-iam</module>
         <module>core-messaging</module>
         <module>core-scheduling</module>
+        <module>core-extension</module>
     </modules>
 
     <properties>
@@ -144,6 +145,11 @@
             <dependency>
                 <groupId>io.openleap.core</groupId>
                 <artifactId>core-scheduling</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.openleap.core</groupId>
+                <artifactId>core-extension</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
