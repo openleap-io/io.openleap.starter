@@ -2,6 +2,34 @@
 
 This guide explains how any service in the openleap platform integrates with IAM for authorization decisions. The `io.openleap.template` project is used as the reference implementation throughout.
 
+<!-- TOC -->
+* [IAM Authorization Integration Guide](#iam-authorization-integration-guide)
+  * [Architecture Overview](#architecture-overview)
+  * [What Is in the JWT](#what-is-in-the-jwt)
+  * [Step-by-Step Integration](#step-by-step-integration)
+    * [1. Add the Starter Dependency](#1-add-the-starter-dependency)
+    * [2. Register the IAM Package Marker in Component Scan](#2-register-the-iam-package-marker-in-component-scan)
+    * [3. Configure the IAM Authz URL](#3-configure-the-iam-authz-url)
+    * [4. Set the Security Mode](#4-set-the-security-mode)
+    * [5. Configure Spring Security for Multi-Realm Keycloak](#5-configure-spring-security-for-multi-realm-keycloak)
+    * [6. Identity Extraction at Request Time](#6-identity-extraction-at-request-time)
+    * [7. Making Authorization Decisions](#7-making-authorization-decisions)
+      * [Option A — Annotation-driven (simple permission check)](#option-a--annotation-driven-simple-permission-check)
+      * [Option B — Programmatic check with resource and context](#option-b--programmatic-check-with-resource-and-context)
+  * [Permission and Policy Provisioning](#permission-and-policy-provisioning)
+    * [Permissions — service-owned, registered at startup](#permissions--service-owned-registered-at-startup)
+    * [Roles and Policies — provisioned at tenant onboarding](#roles-and-policies--provisioned-at-tenant-onboarding)
+    * [Role Assignments — owned by user management, not the service](#role-assignments--owned-by-user-management-not-the-service)
+    * [Ownership Summary](#ownership-summary)
+  * [Resource-Level Grants and Sharing](#resource-level-grants-and-sharing)
+    * [Current recommendation: service-local ACL table](#current-recommendation-service-local-acl-table)
+    * [Future path: OpenFGA for relationship-based access control](#future-path-openfga-for-relationship-based-access-control)
+    * [When to use each approach](#when-to-use-each-approach)
+  * [How the IAM HTTP Call Works](#how-the-iam-http-call-works)
+    * [Request / Response Schema](#request--response-schema)
+  * [Local Development and Testing](#local-development-and-testing)
+  * [Checklist for a New Service](#checklist-for-a-new-service)
+<!-- TOC -->
 ---
 
 ## Architecture Overview
@@ -214,6 +242,156 @@ This overload uses `IdentityHolder.getUserId()` (the Keycloak `sub`) as the user
 
 ---
 
+## Permission and Policy Provisioning
+
+Each service in the platform is responsible for provisioning its own IAM artifacts. The lifecycle is split into three concerns with different owners and trigger points.
+
+### Permissions — service-owned, registered at startup
+
+Permission codes (e.g., `DMS_DOC_DOCUMENT_READ`) are part of the service's own domain definition. Only the service knows what actions exist on its resources. IAM stores them globally but does not define them.
+
+Register permissions idempotently on application startup using an `ApplicationRunner` (or `@PostConstruct`). Treat this the same way you treat Flyway migrations — run on every startup, skip gracefully if already present (IAM returns 409 on duplicates).
+
+```java
+@Component
+public class PermissionBootstrap implements ApplicationRunner {
+
+    private final IamAuthzProvisioningClient iamClient;
+
+    @Override
+    public void run(ApplicationArguments args) {
+        iamClient.registerPermissionIfAbsent("DMS_DOC_DOCUMENT_READ", "dms.doc.document", "READ", "TENANT");
+        iamClient.registerPermissionIfAbsent("DMS_DOC_DOCUMENT_WRITE", "dms.doc.document", "WRITE", "TENANT");
+    }
+}
+```
+
+Permission codes follow the pattern `{SUITE}_{DOMAIN}_{ENTITY}_{ACTION}` (uppercase). Resource identifiers follow `suite.domain.entity` (lowercase dot-separated).
+
+### Roles and Policies — provisioned at tenant onboarding
+
+Roles and ABAC policies are tenant-scoped. They must be created **once per tenant** when a tenant is onboarded into the service — not per request, not per user. Tenant onboarding is the correct trigger point.
+
+In the service's tenant creation handler, after persisting the tenant locally, call IAM to provision the tenant's authorization structure:
+
+```java
+// Inside TenantService.create():
+iamProvisioningClient.createRole(tenantId, "DMS_TENANT_ADMIN", List.of(readPermissionId, writePermissionId));
+iamProvisioningClient.activateRole(tenantId, roleId);
+iamProvisioningClient.createPolicy(tenantId, "DMS_DOC_OWNER_READ", ownerConditionExpr, "ALLOW", 10);
+iamProvisioningClient.activatePolicy(tenantId, policyId);
+```
+
+This ensures every tenant has a consistent authorization baseline from the moment they are created.
+
+**ABAC owner policies** that compare two context fields (e.g., `uploadedBy == requestUserId`) require the `$ref` syntax in the condition expression:
+
+```json
+{
+  "field": "uploadedBy",
+  "operator": "equals",
+  "value": { "$ref": "requestUserId" }
+}
+```
+
+The service then passes the required fields in `context` when calling `/check` at runtime.
+
+### Role Assignments — owned by user management, not the service
+
+Which users get which roles is **not the responsibility of the consumer service**. Role assignment is an administrative concern handled by a user management or onboarding flow that calls IAM directly:
+
+```
+POST /api/v1/iam/authz/roles/{roleId}/assignments
+{ "userId": "...", "validFrom": "..." }
+```
+
+The consumer service never creates role assignments. It only calls `/check` to evaluate whether a user already has the required permission.
+
+### Ownership Summary
+
+| Artifact | Owner | Trigger |
+|---|---|---|
+| Permissions | Consumer service | Application startup (idempotent bootstrap) |
+| Roles | Consumer service | Tenant onboarding |
+| ABAC policies | Consumer service | Tenant onboarding |
+| Role assignments | Admin / identity management flow | User onboarding / role management UI |
+
+---
+
+## Resource-Level Grants and Sharing
+
+RBAC and ABAC policies cover tenant-wide and general-rule authorization. They are not suited for **per-resource, per-user grants** such as sharing a specific document with a specific user. Attempting to model these as IAM policies creates one policy per share, exhausts the priority space (1–1000 per tenant), and abuses a mechanism designed for general rules.
+
+### Current recommendation: service-local ACL table
+
+For explicit sharing (e.g., user-a shares document-X with user-b), the consumer service maintains its own row-level ACL table. The grant is written at share time and checked as a fallback when IAM denies:
+
+```
+GET /documents/{id}
+  │
+  ├─ 1. POST /iam/authz/check { userId, permission, resourceId, context: { uploadedBy, requestUserId } }
+  │       ├─ Admin (RBAC)  → ✅ allow
+  │       └─ Owner (ABAC)  → ✅ allow
+  │
+  ├─ 2. IAM denied → query local ACL: scope=Document, scopeRef=documentId, subjectId=userId
+  │       └─ explicit share entry found → ✅ allow
+  │
+  └─ 3. Still denied → 403
+```
+
+On share, insert a local ACL entry:
+
+```java
+AccessControl share = new AccessControl();
+share.setSubjectId(userBId);
+share.setSubjectType(SubjectType.User);
+share.setPermission(Permission.Read);
+share.setScope(AccessScope.Document);
+share.setScopeRef(documentId);
+accessControlRepository.save(share);
+```
+
+### Future path: OpenFGA for relationship-based access control
+
+When sharing requirements grow beyond simple per-document grants — hierarchical sharing (share a folder, all documents inherit), transitive relationships (member of group → viewer of all group documents), or cross-service resource grants — the right extension is **OpenFGA** integrated into IAM as a third evaluation layer.
+
+OpenFGA models authorization as relationship tuples. The DMS example maps naturally:
+
+```
+Authorization model:
+  type document
+    relations
+      define owner: [user]
+      define viewer: [user] or owner
+
+Tuples:
+  (user:user-a, owner,  document:doc-uuid)   ← written on document creation
+  (user:user-b, viewer, document:doc-uuid)   ← written on share
+```
+
+The existing `resourceId` field on the `/check` request is the OpenFGA object identifier — no API contract change is needed. The `AuthorizationStrategy` pattern in IAM is designed for pluggable evaluation layers; OpenFGA becomes a fourth step in the decision chain:
+
+```
+1. ABAC DENY          → denied immediately
+2. RBAC allow         → allowed (admin)
+3. ABAC ALLOW         → allowed (owner policy)
+4. OpenFGA check      → allowed (explicit share / relationship)
+5. else               → denied
+```
+
+Tuple writes can be driven by service domain events (RabbitMQ outbox) rather than direct IAM calls, keeping the consumer service decoupled from IAM's internal FGA store.
+
+### When to use each approach
+
+| Scenario | Approach |
+|---|---|
+| Tenant-wide role (admin accesses all resources) | IAM RBAC |
+| General ownership rule (creator can access own resource) | IAM ABAC policy |
+| Explicit share with a specific user on a specific resource | Service-local ACL table |
+| Hierarchical / transitive / cross-service relationships | OpenFGA in IAM (future) |
+
+---
+
 ## How the IAM HTTP Call Works
 
 `IamAuthzClientConfig` constructs an `IamAuthzClient` proxy backed by `RestClient` (Spring 6 HTTP interfaces):
@@ -307,3 +485,9 @@ This allows tests to run without Keycloak or IAM Authz Service running.
 - [ ] Use `@RequiresPermission("PERMISSION_CODE")` for simple method-level guards
 - [ ] Use `authorizationService.check(permission, resourceId, context)` when context-aware policies are needed
 - [ ] In tests, use `nosec` mode and inject identity via headers through `NosecHeaderFilter`
+- [ ] Implement an `ApplicationRunner` to register service permissions idempotently on startup
+- [ ] Provision tenant roles and ABAC policies inside the tenant creation handler (not at request time)
+- [ ] Never create role assignments from the consumer service — delegate to user management flows
+- [ ] When using ABAC owner policies, pass the required context fields in every `/check` call (e.g., `uploadedBy`, `requestUserId`)
+- [ ] For per-resource sharing, maintain a service-local ACL table and check it as a fallback after IAM denies
+- [ ] Do not model per-resource shares as IAM policies — consider OpenFGA when relationship complexity grows
